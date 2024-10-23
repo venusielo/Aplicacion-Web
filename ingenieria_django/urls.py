@@ -18,12 +18,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
 from aplicacionING.views import home
+from aplicacionING.views import registro
 from aplicacionING.forms import CustomAuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name= 'home'),
     path('', include('aplicacionING.urls')),
-    path('login/', LoginView.as_view(template_name='registration/login.html', authentication_form=CustomAuthenticationForm), name='login'),  # Página de login
+    path('registro/', registro, name='registro'),
+    path('login/', LoginView.as_view(template_name='registration/login.html', authentication_form=AuthenticationForm), name='login'),  # Página de login
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),  # Página para cerrar sesión
 ]
