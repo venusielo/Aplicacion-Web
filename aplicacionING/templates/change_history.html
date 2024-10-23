@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Historial de Cambios</h1>
+
+<ul>
+    {% for change in history %}
+        <li>
+            <strong>{{ change.project.name }}</strong>: {{ change.change_description }} <br>
+            <em>Fecha: {{ change.change_date }}</em>
+        </li>
+    {% empty %}
+        <li>No hay cambios registrados.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'home' %}">Volver a la página principal</a>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% load static %}
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Formulario para crear carpetas -->
+<h2>Crear nueva carpeta</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Crear carpeta</button>
+</form>
+
+{% endblock %}

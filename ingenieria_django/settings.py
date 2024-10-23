@@ -127,7 +127,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # Directorios de plantillas adicionales
+        'DIRS': [BASE_DIR / 'templates'],  # Directorios de plantillas adicionales
         'APP_DIRS': True,  # Habilita la búsqueda de plantillas en las carpetas 'templates' de cada aplicación
         'OPTIONS': {
             'context_processors': [
@@ -143,3 +143,9 @@ TEMPLATES = [
 LOGIN_URL = '/login/'  # URL de la página de login
 
 LOGIN_REDIRECT_URL = '/'  # redirigir despues del login
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]

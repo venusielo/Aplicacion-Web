@@ -1,14 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
-from .models import Carpeta
+from .models import ProjectFolder, ActivityFolder
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-class CarpetaForm(forms.ModelForm):
-    class Meta:
-        model = Carpeta
-        fields = ['nombre']  # Campo que queremos mostrar en el formulario
 
 class CustomAuthenticationForm(AuthenticationForm):
     error_messages = {
@@ -17,6 +13,16 @@ class CustomAuthenticationForm(AuthenticationForm):
         ),
         'inactive': _("Esta cuenta está inactiva."),
     }
+
+class ProjectFolderForm(forms.ModelForm):
+    class Meta:
+        model = ProjectFolder
+        fields = ['name', 'description']
+
+class ActivityFolderForm(forms.ModelForm):
+    class Meta:
+        model = ActivityFolder
+        fields = ['project', 'name', 'description', 'due_date']
 
 class RegistroForm(forms.ModelForm):
 

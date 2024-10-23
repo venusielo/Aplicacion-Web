@@ -1,11 +1,17 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Página Principal</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <h1>Bienvenido a la Página Principal</h1>
-    <a href="{% url 'crear_carpeta' %}">Crear Carpeta</a>
+    <ul>
+        <li><a href="{% url 'list_project_folders' %}">Ver Proyectos</a></li>
+        <li><a href="{% url 'create_activity_folder' %}">Crear Nueva Actividad</a></li>
+        <li><a href="{% url 'change_history' %}">Historial de Cambios</a></li> <!-- Nuevo enlace -->
+    </ul>
 </body>
 </html>
