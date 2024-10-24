@@ -24,15 +24,6 @@ def create_project_folder(request):
         form = ProjectFolderForm()
     return render(request, 'create_project_folder.html', {'form': form})
 
-def create_activity_folder(request):
-    if request.method == 'POST':
-        form = ActivityFolderForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('list_project_folders')  # Redirect to list or project detail
-    else:
-        form = ActivityFolderForm()
-    return render(request, 'create_activity_folder.html', {'form': form})
 
 def list_project_folders(request):
     projects = ProjectFolder.objects.all()
@@ -75,3 +66,17 @@ def change_history(request):
 def OpenProject(request, project_id):
     project = get_object_or_404(ProjectFolder, id = project_id)
     return render(request, 'OpenProject.html', {'project' : project})
+
+def create_activity_folder(request, project_id):
+    project = get_object_or_404(ProjectFolder, id=project_id)
+    if request.method == 'POST':
+        form = ActivityFolderForm(request.POST)
+        if form.is_valid():
+            activity = form.save(commit=False)
+            activity.project = project
+            activity.save()
+            return redirect('OpenProject', project_id=project_id)
+    else:
+        form = ActivityFolderForm()
+
+    return render(request, 'create_activity.html', {'form': form, 'project': project})

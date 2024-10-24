@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Agregar actividad para el proyecto: {{ proyecto.name }}</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar Actividad</button>
+</form>
+
+<a href="{% url 'OpenProject' project.id %}">Volver al proyecto</a>
+{% endblock %}

@@ -3,5 +3,14 @@
 {% block content %}
 <h1>{{ proyecto.name }}</h1>
 <p>{{ proyecto.description }}</p>
-<a href="{% url 'carpetas' %}">Volver al listado de proyectos</a>
+
+<h2>Actividades del proyecto</h2>
+<ul>
+    {% for activity in proyecto.activities.all %}
+        <li>{{ activity.name }} - Fecha límite: {{ activity.due_date }}</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'create_activity' project.id %}">Agregar Actividad</a><br>
+<a href="{% url 'home' %}">Volver al listado de proyectos</a>
 {% endblock %}

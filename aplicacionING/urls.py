@@ -11,4 +11,5 @@ urlpatterns = [
     path('change_history/', views.change_history, name='change_history'),
     path('CreateProject/', views.create_project, name='CreateProject'),
     path('project/<int:project_id>/', views.OpenProject, name='OpenProject'),
+    path('project/<int:project_id>/create_activity_folder', views.create_activity_folder, name='create_activity')
 ]
