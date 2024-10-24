@@ -9,11 +9,6 @@
         <li>
             <a href="{% url 'OpenProject' project.id%}">{{ project.name }}</a> - {{ project.description }}
         </li>
-        <ul>
-            {% for activity in project.activities.all %}
-                <li>{{ activity.name }} - Fecha límite: {{ activity.due_date }}</li>
-            {% endfor %}
-        </ul>
     {% endfor %}
 </ul>
 <a href="{% url 'home' %}">Volver a la pagina principal</a>

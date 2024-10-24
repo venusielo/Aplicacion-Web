@@ -69,6 +69,7 @@ def OpenProject(request, project_id):
 
 def create_activity_folder(request, project_id):
     project = get_object_or_404(ProjectFolder, id=project_id)
+
     if request.method == 'POST':
         form = ActivityFolderForm(request.POST)
         if form.is_valid():
@@ -77,6 +78,10 @@ def create_activity_folder(request, project_id):
             activity.save()
             return redirect('OpenProject', project_id=project_id)
     else:
-        form = ActivityFolderForm()
+        form = ActivityFolderForm(initial={'project': project})
 
     return render(request, 'create_activity.html', {'form': form, 'project': project})
+
+def open_activity(request, activity_id):
+    activity = get_object_or_404(create_activity_folder, id=activity_id)
+    return render(request, 'create_activity.html', {'activity': activity})
