@@ -1,21 +1,87 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Página Principal</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
-    <h1>Gestor de proyectos</h1>
-    <ul>
-        <li><a href="{% url 'CreateProject' %}">Crear Proyectos</a></li>
-        <li><a href="{% url 'list_project_folders' %}">Ver Proyectos</a></li>
-        <li><a href="{% url 'change_history' %}">Historial de Cambios</a></li> <!-- Nuevo enlace -->
-    </ul>
-    <form action="{% url 'logout' %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Cerrar Sesión</button>
-    </form>
-</body>
-</html>
+
+{% block content %}
+<div class="container">
+            <div class="project-banner">
+            <img src="{% static 'images/kira_proyecto.png' %}" alt="Project Cat" class="cat-image">
+            <h1>GESTOR DE PROYECTOS</h1>
+        </div>
+
+        <div class="project-options">
+            <ul>
+                <li><a href="{% url 'CreateProject' %}" class="button">Crear Proyectos</a></li>
+                <li><a href="{% url 'list_project_folders' %}" class="button">Ver Proyectos</a></li>
+                <li><a href="{% url 'change_history' %}" class="button">Historial de Cambios</a></li>
+            </ul>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Cerrar Sesión</button>
+            </form>
+        </div>
+</div>
+
+<style>
+    body {
+        background-color: #f0f0f0;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .content-wrapper {
+        background-color: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .project-banner {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .cat-image {
+        width: 150px;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+    h1 {
+        color: #333;
+        font-size: 2.5rem;
+    }
+
+    .project-options ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .project-options li {
+        margin-bottom: 20px;
+    }
+
+    .button {
+        background-color: #007bff;
+        color: white;
+        padding: 15px 30px;
+        text-decoration: none;
+        border-radius: 10px;
+        display: inline-block;
+        font-size: 1.2rem;
+        transition: background-color 0.3s ease;
+        width: 250px;
+    }
+
+    .button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+{% endblock %}
+>>>>>>> origin/dani

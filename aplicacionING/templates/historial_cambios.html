@@ -1,0 +1,11 @@
+<h1>Historial de cambios para {{ proyecto.name }}</h1>
+
+<ul>
+    {% for cambio in historial %}
+        <li>{{ cambio.change_date }} - {{ cambio.change_description }}</li>
+    {% empty %}
+        <li>No hay cambios registrados para este proyecto.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'proyecto_detalle' proyecto.id %}">Volver al proyecto</a>

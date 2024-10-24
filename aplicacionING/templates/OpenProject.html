@@ -1,26 +1,101 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ project.name }}</h1>
-<strong>Descripcion del Proyecto: </strong>{{ project.description }}<br>
+<div class="container">
+    <h1>{{ project.name }}</h1>
+    <p><strong>Descripción del Proyecto:</strong> {{ project.description }}</p>
 
-<h2>Actividades del proyecto</h2>
-<ul>
-    {% for activity in project.activities.all %}
-        <li>
-            <details>
-                <summary>{{ activity.name }}</summary>
-                <strong>Descripcion:</strong> {{ activity.description }} <br>
-                <strong>Fecha Limite: </strong>{{ activity.name }} - Fecha límite: {{ activity.due_date }} <br>
-                <form method="POST" action="{% url 'delete_activity' project_id=project.id activity_id=activity.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </form>
-            </details>
-        </li>
-    {% endfor %}
-</ul>
+    <h2>Actividades del proyecto</h2>
+    <ul class="activity-list">
+        {% for activity in project.activities.all %}
+            <li class="activity-item">
+                <details>
+                    <summary>{{ activity.name }}</summary>
+                    <p><strong>Descripción:</strong> {{ activity.description }}</p>
+                    <p><strong>Fecha Límite:</strong> {{ activity.due_date }}</p>
+                </details>
+            </li>
+        {% endfor %}
+    </ul>
 
-<a href="{% url 'create_activity' project.id%}">Agregar Actividad</a><br>
-<a href="{% url 'home' %}">Volver al listado de proyectos</a>
+    <a href="{% url 'create_activity' project.id %}" class="button">Agregar Actividad</a><br>
+    <a href="{% url 'home' %}" class="back-link">Volver al listado de proyectos</a>
+</div>
+
+<style>
+    body {
+        background-color: #f0f0f0;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        font-size: 2rem;
+        margin-top: 30px;
+        margin-bottom: 15px;
+    }
+
+    .activity-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .activity-item {
+        margin-bottom: 20px;
+    }
+
+    details {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    summary {
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        margin-top: 20px;
+        font-size: 1rem;
+    }
+
+    .button:hover {
+        background-color: #0056b3;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 10px;
+        text-decoration: none;
+        color: #007bff;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+</style>
+
 {% endblock %}

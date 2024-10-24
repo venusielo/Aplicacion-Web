@@ -1,27 +1,119 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Proyectos guardados</h1>
+<div class="container">
+    <h1>Proyectos guardados</h1>
 
-<!-- Listado de carpetas principales -->
-<ul>
-    {% for project in projects %}
-
-    <div class="project-item">
-        <h3>{{ project.name }}</h3>
-        <div class="dropdown">
-            <button class="dropbtn">Opciones</button>
-            <div class="dropdown-content">
-                <a href="{% url 'OpenProject' project.id%}">{{ project.name }}</a> - {{ project.description }}
-                <form action="{% url 'DeleteProject' project.id %}" method="POST" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este proyecto?');">Eliminar proyecto</button>
-                </form>                
+    <!-- Listado de carpetas principales -->
+    <ul class="project-list">
+        {% for project in projects %}
+        <li class="project-item">
+            <h3>{{ project.name }}</h3>
+            <p>{{ project.description }}</p>
+            <div class="dropdown">
+                <button class="dropbtn">Opciones</button>
+                <div class="dropdown-content">
+                    <a href="{% url 'OpenProject' project.id %}">Abrir proyecto</a>
+                    <form action="{% url 'DeleteProject' project.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este proyecto?');">Eliminar proyecto</button>
+                    </form>                
+                </div>
             </div>
-        </div>
-    </div>
+        </li>
+        {% endfor %}
+    </ul>
 
-    {% endfor %}
-</ul>
-<a href="{% url 'home' %}">Volver a la pagina principal</a>
+    <a href="{% url 'home' %}" class="back-link">Volver a la página principal</a>
+</div>
+
+<style>
+    body {
+        background-color: #f0f0f0;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .project-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .project-item {
+        background-color: #fafafa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        text-align: left;
+    }
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropbtn {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+        padding: 12px 16px;
+        z-index: 1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    .dropdown-content a, .dropdown-content button {
+        color: #007bff;
+        padding: 10px;
+        text-decoration: none;
+        display: block;
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+    }
+
+    .dropdown-content button:hover, .dropdown-content a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        text-decoration: none;
+        color: #007bff;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
 {% endblock %}
