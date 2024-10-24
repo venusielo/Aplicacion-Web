@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
-from .models import ProjectFolder, ChangeHistory
+from .models import ProjectFolder, ChangeHistory, ActivityFolder
 from .forms import ProjectFolderForm, ActivityFolderForm, RegistroForm
 
 # @login_required  # Requiere que el usuario esté autenticado
@@ -103,11 +103,20 @@ def create_activity_folder(request, project_id):
             activity.project = project
             activity.save()
             return redirect('OpenProject', project_id=project_id)
+        else:
+            print(form.errors)
     else:
         form = ActivityFolderForm(initial={'project': project})
 
     return render(request, 'create_activity.html', {'form': form, 'project': project})
 
 def open_activity(request, activity_id):
-    activity = get_object_or_404(create_activity_folder, id=activity_id)
+    activity = get_object_or_404(ActivityFolder, id=activity_id)
     return render(request, 'create_activity.html', {'activity': activity})
+
+def delete_activity(request, activity_id, project_id):
+    activity = get_object_or_404(ActivityFolder, id=activity_id)
+
+    if request.method == 'POST':
+        activity.delete()
+        return redirect('OpenProject', project_id=project_id)

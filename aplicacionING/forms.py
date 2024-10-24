@@ -22,7 +22,7 @@ class ProjectFolderForm(forms.ModelForm):
 class ActivityFolderForm(forms.ModelForm):
     class Meta:
         model = ActivityFolder
-        fields = ['project', 'name', 'description', 'due_date']
+        fields = ['name', 'description', 'due_date']
         widgets = {
             'due_date': forms.DateInput(attrs={'type':'date'})
         }
