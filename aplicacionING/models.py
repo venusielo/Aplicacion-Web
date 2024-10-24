@@ -8,6 +8,10 @@ class ProjectFolder(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def delete(self, *args, **kwargs):
+        self.activities.all().delete()
+        super(ProjectFolder, self).delete(*args, **kwargs)
 
 class ActivityFolder(models.Model):
     project = models.ForeignKey(ProjectFolder, on_delete=models.CASCADE, related_name='activities')

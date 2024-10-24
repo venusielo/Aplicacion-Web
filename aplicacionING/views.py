@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
 from .models import ProjectFolder, ChangeHistory
 from .forms import ProjectFolderForm, ActivityFolderForm, RegistroForm
 
@@ -66,6 +67,31 @@ def change_history(request):
 def OpenProject(request, project_id):
     project = get_object_or_404(ProjectFolder, id = project_id)
     return render(request, 'OpenProject.html', {'project' : project})
+
+def DeleteProject(request, project_id):
+    project = get_object_or_404(ProjectFolder, id=project_id)
+    
+    if request.method == 'POST':
+        project_name = project.name
+        print(f"Intentando eliminar el proyecto: {project_name}")  # Mensaje de depuración
+        
+        ChangeHistory.objects.create(
+            project=project,
+            change_description=f'Se eliminó el proyecto {project_name}'
+        )
+
+        project.activities.all().delete()
+        # Eliminar el proyecto
+        project.delete()
+        
+        print(f"Proyecto {project_name} eliminado de la base de datos.")  # Confirmación en consola
+        messages.success(request, f'El proyecto "{project_name}" ha sido eliminado exitosamente.')
+
+        return redirect('home')
+    
+    # Si la solicitud no es POST, simplemente redirige
+    return redirect('home')
+
 
 def create_activity_folder(request, project_id):
     project = get_object_or_404(ProjectFolder, id=project_id)

@@ -6,14 +6,19 @@
 <!-- Listado de carpetas principales -->
 <ul>
     {% for project in projects %}
-        <li>
-            <a href="{% url 'OpenProject' project.id%}">{{ project.name }}</a> - {{ project.description }}
-        </li>
-        <ul>
-            {% for activity in project.activities.all %}
-                <li>{{ activity.name }} - Fecha límite: {{ activity.due_date }}</li>
-            {% endfor %}
-        </ul>
+    <div class="project-item">
+        <h3>{{ project.name }}</h3>
+        <div class="dropdown">
+            <button class="dropbtn">Opciones</button>
+            <div class="dropdown-content">
+                <a href="{% url 'OpenProject' project.id %}">Entrar al proyecto</a>
+                <form action="{% url 'DeleteProject' project.id %}" method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este proyecto?');">Eliminar proyecto</button>
+                </form>                
+            </div>
+        </div>
+    </div>
     {% endfor %}
 </ul>
 <a href="{% url 'home' %}">Volver a la pagina principal</a>
