@@ -8,6 +8,21 @@ from .forms import ProjectFolderForm, ActivityFolderForm, RegistroForm
 # @login_required  # Requiere que el usuario esté autenticado
 def home(request):
     return render(request, 'home.html')
+def modificar_proyecto(request, proyecto_id):
+    proyecto = get_object_or_404(ProjectFolder, id=proyecto_id)
+    if request.method == "POST":
+        # Aquí iría el código que modifica los detalles del proyecto
+        proyecto.name = request.POST.get('name')
+        proyecto.description = request.POST.get('description')
+        proyecto.save()
+        
+        # Registrar el cambio en el historial
+        ChangeHistory.objects.create(
+            project=proyecto,
+            change_description="El proyecto fue modificado"
+        )
+    
+    return redirect('proyecto_detalle', proyecto_id=proyecto_id)
 
 def create_project_folder(request):
     if request.method == 'POST':

@@ -15,5 +15,4 @@ urlpatterns = [
     path('project/<int:project_id>/create_activity', views.create_activity_folder, name='create_activity'),
 #    path('activity/<int:activity_id>/', views.open_activity, name='create_activity'),
     path('project/<int:project_id>/delete_activity/<int:activity_id>/', views.delete_activity, name='delete_activity'),
-
 ]

@@ -1,0 +1,86 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    margin: 10px 0;
+}
+
+.button {
+    background-color: #007bff; /* Blue color for the buttons */
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+    margin: 10px;
+}
+
+.button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+form button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #0069d9;
+}
+
+.project-banner {
+    position: relative;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.border-image {
+    width: 100%;
+    height: auto;
+}
+
+.project-info {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.cat-image {
+    width: 150px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.project-options {
+    text-align: center;
+    margin-top: 40px;
+}
