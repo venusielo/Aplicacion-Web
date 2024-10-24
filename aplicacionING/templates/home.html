@@ -3,22 +3,22 @@
 
 {% block content %}
 <div class="container">
-            <div class="project-banner">
-            <img src="{% static 'images/kira_proyecto.png' %}" alt="Project Cat" class="cat-image">
-            <h1>GESTOR DE PROYECTOS</h1>
-        </div>
+    <div class="project-banner">
+        <img src="{% static 'images/kira_proyecto.png' %}" alt="Project Cat" class="cat-image">
+        <h1>CatNest</h1>
+    </div>
 
-        <div class="project-options">
-            <ul>
-                <li><a href="{% url 'CreateProject' %}" class="button">Crear Proyectos</a></li>
-                <li><a href="{% url 'list_project_folders' %}" class="button">Ver Proyectos</a></li>
-                <li><a href="{% url 'change_history' %}" class="button">Historial de Cambios</a></li>
-            </ul>
-            <form action="{% url 'logout' %}" method="post">
-                {% csrf_token %}
-                <button type="submit">Cerrar Sesión</button>
-            </form>
-        </div>
+    <div class="project-options">
+        <ul>
+            <li><a href="{% url 'CreateProject' %}" class="button">Crear Proyectos</a></li>
+            <li><a href="{% url 'list_project_folders' %}" class="button">Ver Proyectos</a></li>
+            <li><a href="{% url 'change_history' %}" class="button">Historial de Cambios</a></li>
+        </ul>
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Cerrar Sesión</button>
+        </form>
+    </div>
 </div>
 
 <style>
@@ -28,60 +28,69 @@
 
     .container {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-    }
-
-    .content-wrapper {
-        background-color: white;
-        padding: 40px;
-        border-radius: 15px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        height: 90vh; /* Ajuste de altura para mejor centrado */
         text-align: center;
-    }
-
-    .project-banner {
-        text-align: center;
-        margin-bottom: 40px;
+        padding: 20px; /* Añadir padding para evitar que los elementos se peguen a los bordes */
     }
 
     .cat-image {
-        width: 150px;
+        width: 130px; /* Reducir un poco el tamaño de la imagen para que no se desborde */
         height: auto;
         margin-bottom: 10px;
     }
 
     h1 {
         color: #333;
-        font-size: 2.5rem;
+        font-size: 2.2rem; /* Ajustar el tamaño de la fuente */
+        margin-bottom: 20px; /* Reducir el margen inferior para más espacio entre el título y los botones */
+        font-family: 'Satisfy', cursive;
     }
 
     .project-options ul {
         list-style: none;
         padding: 0;
+        margin: 0;
     }
 
     .project-options li {
-        margin-bottom: 20px;
+        margin-bottom: 15px; /* Ajustar el espacio entre los botones */
     }
 
     .button {
         background-color: #007bff;
         color: white;
-        padding: 15px 30px;
+        padding: 12px 25px; /* Ajustar el tamaño de los botones */
         text-decoration: none;
         border-radius: 10px;
         display: inline-block;
-        font-size: 1.2rem;
+        font-size: 1.1rem; /* Ajustar el tamaño de la fuente en los botones */
         transition: background-color 0.3s ease;
-        width: 250px;
+        width: 220px; /* Ajustar el ancho de los botones */
+        text-align: center;
     }
 
     .button:hover {
         background-color: #0056b3;
     }
-</style>
 
+    form button {
+        margin-top: 15px; /* Ajustar el espacio entre el botón y los otros elementos */
+        background-color: #ff4b5c;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 220px; /* Mantener consistencia con los botones de arriba */
+    }
+
+    form button:hover {
+        background-color: #d43f4a;
+    }
+</style>
 {% endblock %}
->>>>>>> origin/dani
