@@ -5,10 +5,11 @@ from django.contrib import messages
 from .models import ProjectFolder, ChangeHistory, ActivityFolder
 from .forms import ProjectFolderForm, ActivityFolderForm, RegistroForm
 
-# @login_required  # Requiere que el usuario esté autenticado
+@login_required  # Requiere que el usuario esté autenticado
 def home(request):
     return render(request, 'home.html')
 
+@login_required
 def create_project_folder(request):
     if request.method == 'POST':
         form = ProjectFolderForm(request.POST)
@@ -25,7 +26,7 @@ def create_project_folder(request):
         form = ProjectFolderForm()
     return render(request, 'create_project_folder.html', {'form': form})
 
-
+@login_required
 def list_project_folders(request):
     projects = ProjectFolder.objects.all()
     if not projects:
@@ -33,6 +34,7 @@ def list_project_folders(request):
         return render(request, 'carpetas.html', {'message': message})
     return render(request, 'carpetas.html', {'projects': projects})
 
+@login_required
 def create_project(request):
     if request.method == 'POST':
         form = ProjectFolderForm(request.POST)
@@ -68,6 +70,7 @@ def OpenProject(request, project_id):
     project = get_object_or_404(ProjectFolder, id = project_id)
     return render(request, 'OpenProject.html', {'project' : project})
 
+@login_required
 def DeleteProject(request, project_id):
     project = get_object_or_404(ProjectFolder, id=project_id)
     
@@ -92,7 +95,7 @@ def DeleteProject(request, project_id):
     # Si la solicitud no es POST, simplemente redirige
     return redirect('home')
 
-
+@login_required
 def create_activity_folder(request, project_id):
     project = get_object_or_404(ProjectFolder, id=project_id)
 
@@ -110,10 +113,12 @@ def create_activity_folder(request, project_id):
 
     return render(request, 'create_activity.html', {'form': form, 'project': project})
 
+@login_required
 def open_activity(request, activity_id):
     activity = get_object_or_404(ActivityFolder, id=activity_id)
     return render(request, 'create_activity.html', {'activity': activity})
 
+@login_required
 def delete_activity(request, activity_id, project_id):
     activity = get_object_or_404(ActivityFolder, id=activity_id)
 

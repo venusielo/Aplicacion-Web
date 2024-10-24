@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.shortcuts import redirect
 from django.urls import path, include
 from django.contrib.auth.views import LoginView, LogoutView
 from aplicacionING.views import home
@@ -24,7 +25,7 @@ from django.contrib.auth.forms import AuthenticationForm
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home, name= 'home'),
+    path('', home, name='home'),  # Página principal protegida
     path('', include('aplicacionING.urls')),
     path('registro/', registro, name='registro'),
     path('login/', LoginView.as_view(template_name='registration/login.html', authentication_form=AuthenticationForm), name='login'),  # Página de login
