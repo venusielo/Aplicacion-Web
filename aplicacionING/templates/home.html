@@ -13,5 +13,9 @@
         <li><a href="{% url 'list_project_folders' %}">Ver Proyectos</a></li>
         <li><a href="{% url 'change_history' %}">Historial de Cambios</a></li> <!-- Nuevo enlace -->
     </ul>
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Cerrar Sesión</button>
+    </form>
 </body>
 </html>
