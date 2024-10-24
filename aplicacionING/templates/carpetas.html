@@ -1,12 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Carpetas Principales</h1>
+<h1>Proyectos guardados</h1>
 
 <!-- Listado de carpetas principales -->
 <ul>
     {% for project in projects %}
-        <li>{{ project.name }} - {{ project.description }}</li>
+        <li>
+            <a href="{% url 'OpenProject' project.id%}">{{ project.name }}</a> - {{ project.description }}
+        </li>
         <ul>
             {% for activity in project.activities.all %}
                 <li>{{ activity.name }} - Fecha límite: {{ activity.due_date }}</li>
@@ -14,4 +16,5 @@
         </ul>
     {% endfor %}
 </ul>
+<a href="{% url 'home' %}">Volver a la pagina principal</a>
 {% endblock %}

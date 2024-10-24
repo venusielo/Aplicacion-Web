@@ -26,3 +26,4 @@ class ChangeHistory(models.Model):
 
     def __str__(self):
         return f"Cambio en {self.project.name} - {self.change_date}"
+    

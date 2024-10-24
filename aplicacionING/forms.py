@@ -39,3 +39,8 @@ class RegistroForm(forms.ModelForm):
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Las contraseñas no coinciden.")
         return password2
+    
+    class ProjectForm(forms.ModelForm):
+        class Meta:
+            model = ProjectFolder
+            fields = ['name', 'description']

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from .models import ProjectFolder, ChangeHistory
@@ -46,10 +46,11 @@ def create_project(request):
         form = ProjectFolderForm(request.POST)
         if form.is_valid():
              form.save()
-             return redirect('carpetas.html')
+             return redirect('home')
     else:
         form = ProjectFolderForm()  
-    return render(request, 'carpetas.html', {'form': form})     
+
+    return render(request, 'CreateProject.html', {'form': form})     
 
 
 def registro(request):
@@ -71,4 +72,6 @@ def change_history(request):
     return render(request, 'change_history.html', {'history': history})
 # @login_required  # Requiere que el usuario esté autenticado
 
-
+def OpenProject(request, project_id):
+    project = get_object_or_404(ProjectFolder, id = project_id)
+    return render(request, 'OpenProject.html', {'project' : project})

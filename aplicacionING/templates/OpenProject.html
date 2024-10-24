@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ proyecto.name }}</h1>
+<p>{{ proyecto.description }}</p>
+<a href="{% url 'carpetas' %}">Volver al listado de proyectos</a>
+{% endblock %}

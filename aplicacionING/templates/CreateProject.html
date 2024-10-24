@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+    <h1>Crear Nuevo Proyecto</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar Proyecto</button>
+    </form>
+
+    <a href="{% url 'home' %}">Volver a la página principal</a>
+{% endblock %}
