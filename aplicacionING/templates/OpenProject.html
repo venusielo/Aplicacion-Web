@@ -1,16 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ proyecto.name }}</h1>
-<p>{{ proyecto.description }}</p>
+<h1>{{ project.name }}</h1>
+<strong>Descripcion del Proyecto: </strong>{{ project.description }}<br>
 
 <h2>Actividades del proyecto</h2>
 <ul>
-    {% for activity in proyecto.activities.all %}
-        <li>{{ activity.name }} - Fecha límite: {{ activity.due_date }}</li>
+    {% for activity in project.activities.all %}
+        <li>
+            <details>
+                <summary>{{ activity.name }}</summary>
+                <strong>Descripcion:</strong> {{ activity.description }} <br>
+                <strong>Fecha Limite: </strong>{{ activity.name }} - Fecha límite: {{ activity.due_date }} <br>
+            </details>
+        </li>
     {% endfor %}
 </ul>
 
-<a href="{% url 'create_activity' project.id %}">Agregar Actividad</a><br>
+<a href="{% url 'create_activity' project.id%}">Agregar Actividad</a><br>
 <a href="{% url 'home' %}">Volver al listado de proyectos</a>
 {% endblock %}

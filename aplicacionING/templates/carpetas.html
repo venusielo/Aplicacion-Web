@@ -6,12 +6,13 @@
 <!-- Listado de carpetas principales -->
 <ul>
     {% for project in projects %}
+
     <div class="project-item">
         <h3>{{ project.name }}</h3>
         <div class="dropdown">
             <button class="dropbtn">Opciones</button>
             <div class="dropdown-content">
-                <a href="{% url 'OpenProject' project.id %}">Entrar al proyecto</a>
+                <a href="{% url 'OpenProject' project.id%}">{{ project.name }}</a> - {{ project.description }}
                 <form action="{% url 'DeleteProject' project.id %}" method="POST" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este proyecto?');">Eliminar proyecto</button>
@@ -19,6 +20,7 @@
             </div>
         </div>
     </div>
+
     {% endfor %}
 </ul>
 <a href="{% url 'home' %}">Volver a la pagina principal</a>
