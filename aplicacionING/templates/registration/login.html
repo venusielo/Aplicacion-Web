@@ -1,28 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión</title>
+    <title>Iniciar Sesión - CatNest</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 85vh;
         }
         .container {
-            max-width: 400px;
-            margin: auto;
-            padding: 20px;
+            max-width: 350px;  /* Ajustamos el ancho del formulario */
+            padding: 350px;
             background: white;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            text-align: center;
         }
         h1 {
-            text-align: center;
-            color: #333;
-        }
+        color: #333;
+        font-size: 5rem; /* Ajustar el tamaño de la fuente */
+        margin-bottom: 20px; /* Reducir el margen inferior para más espacio entre el título y los botones */
+        font-family: 'Satisfy', cursive;
+         }
         form {
             display: flex;
             flex-direction: column;
@@ -34,34 +42,51 @@
             border-radius: 5px;
         }
         button {
-            padding: 10px;
-            margin-top: 10px;
-            background-color: #5cb85c;
-            border: none;
-            color: white;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #4cae4c;
-        }
+        background-color: #007bff;
+        color: white;
+        padding: 12px 25px; /* Ajustar el tamaño de los botones */
+        text-decoration: none;
+        border-radius: 10px;
+        display: inline-block;
+        font-size: 1.1rem; /* Ajustar el tamaño de la fuente en los botones */
+        transition: background-color 0.3s ease;
+        width: 220px; /* Ajustar el ancho de los botones */
+        text-align: center;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
         .back-link {
             text-align: center;
             margin-top: 20px;
+        }
+        .logo {
+            width: 100px;
+            margin-bottom: 10px;
+        }
+        .border-decor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('{% static "images/lovepik-vector-color-rectangular-border-png-image_401060606.png" %}') no-repeat center center;
+            background-size: contain;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Iniciar Sesión</h1>
+        <div class="border-decor"></div> <!-- Borde decorativo -->
+        <h1>CatNest</h1>
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Iniciar Sesión</button>
         </form>
+        <p>¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate aquí</a></p>
     </div>
-
-    <p>¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate aquí</a></p>  <!-- Enlace a la página de registro -->
 </body>
 </html>
