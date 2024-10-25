@@ -13,6 +13,10 @@
                     <summary>{{ activity.name }}</summary>
                     <p><strong>Descripción:</strong> {{ activity.description }}</p>
                     <p><strong>Fecha Límite:</strong> {{ activity.due_date }}</p>
+                    <form method="POST" action="{% url 'delete_activity' project_id=project.id activity_id=activity.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
                 </details>
             </li>
         {% endfor %}

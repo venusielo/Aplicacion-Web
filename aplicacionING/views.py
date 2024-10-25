@@ -8,15 +8,16 @@ from .forms import ProjectFolderForm, ActivityFolderForm, RegistroForm
 @login_required  # Requiere que el usuario esté autenticado
 def home(request):
     return render(request, 'home.html')
+
 def modificar_proyecto(request, proyecto_id):
     proyecto = get_object_or_404(ProjectFolder, id=proyecto_id)
     if request.method == "POST":
-        # Aquí iría el código que modifica los detalles del proyecto
+        
         proyecto.name = request.POST.get('name')
         proyecto.description = request.POST.get('description')
         proyecto.save()
         
-        # Registrar el cambio en el historial
+        
         ChangeHistory.objects.create(
             project=proyecto,
             change_description="El proyecto fue modificado"
@@ -31,7 +32,7 @@ def create_project_folder(request):
         if form.is_valid():
             project = form.save()
             
-            #registrar el cambio
+
             ChangeHistory.objects.create(
                 project = project,
                 change_description = f"Se creó el proyecto {project.name}"
@@ -54,7 +55,15 @@ def create_project(request):
     if request.method == 'POST':
         form = ProjectFolderForm(request.POST)
         if form.is_valid():
-             form.save()
+             project = form.save(commit=False)
+             project.owner = request.user  # Asigna el usuario actual como propietario
+             project.save()
+
+             ChangeHistory.objects.create(
+                project=project,
+                change_description="Proyecto creado"
+             )
+
              return redirect('home')
     else:
         form = ProjectFolderForm()  
@@ -120,6 +129,13 @@ def create_activity_folder(request, project_id):
             activity = form.save(commit=False)
             activity.project = project
             activity.save()
+
+            ChangeHistory.objects.create(
+                project=project,
+                activity=activity,
+                change_description=f"Actividad '{activity.name}' creada en el proyecto '{project.name}'"
+            )
+
             return redirect('OpenProject', project_id=project_id)
         else:
             print(form.errors)
@@ -140,3 +156,15 @@ def delete_activity(request, activity_id, project_id):
     if request.method == 'POST':
         activity.delete()
         return redirect('OpenProject', project_id=project_id)
+    
+
+def delete_activity(request, activity_id, project_id):
+    activity = get_object_or_404(ActivityFolder, id=activity_id)
+
+    if request.method == 'POST':
+        activity.delete()
+        return redirect('OpenProject', project_id=project_id)
+    
+def ver_historial(request):
+    historial = ChangeHistory.objects.filter(project__owner=request.user).order_by('-change_date')
+    return render(request, 'change_history.html', {'change_history': change_history})
