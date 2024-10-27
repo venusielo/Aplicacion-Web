@@ -13,7 +13,17 @@
             <li><a href="{% url 'CreateProject' %}" class="button">Crear Proyectos</a></li>
             <li><a href="{% url 'list_project_folders' %}" class="button">Ver Proyectos</a></li>
             <li><a href="{% url 'change_history' %}" class="button">Historial de Cambios</a></li>
+            
+            {% if user.is_superuser %}
+                <!-- Opciones adicionales solo para el administrador -->
+                <li><a href="{% url 'ver_usuarios' %}" class="button">Ver Usuarios Registrados</a></li>
+                <li><a href="{% url 'Crear_rol' %}" class="button">Crear Roles</a></li>
+            {% endif %}
+            
+            <!-- Opción para ver permisos disponible para todos los usuarios -->
+            <li><a href="{% url 'ver_permisos' %}" class="button">Ver Mis Permisos</a></li>
         </ul>
+        
         <form action="{% url 'logout' %}" method="post">
             {% csrf_token %}
             <button type="submit">Cerrar Sesión</button>
@@ -31,21 +41,21 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 90vh; /* Ajuste de altura para mejor centrado */
+        height: 90vh;
         text-align: center;
-        padding: 20px; /* Añadir padding para evitar que los elementos se peguen a los bordes */
+        padding: 20px;
     }
 
     .cat-image {
-        width: 130px; /* Reducir un poco el tamaño de la imagen para que no se desborde */
+        width: 130px;
         height: auto;
         margin-bottom: 10px;
     }
 
     h1 {
         color: #333;
-        font-size: 2.2rem; /* Ajustar el tamaño de la fuente */
-        margin-bottom: 20px; /* Reducir el margen inferior para más espacio entre el título y los botones */
+        font-size: 2.2rem;
+        margin-bottom: 20px;
         font-family: 'Satisfy', cursive;
     }
 
@@ -56,19 +66,19 @@
     }
 
     .project-options li {
-        margin-bottom: 15px; /* Ajustar el espacio entre los botones */
+        margin-bottom: 15px;
     }
 
     .button {
         background-color: #007bff;
         color: white;
-        padding: 12px 25px; /* Ajustar el tamaño de los botones */
+        padding: 12px 25px;
         text-decoration: none;
         border-radius: 10px;
         display: inline-block;
-        font-size: 1.1rem; /* Ajustar el tamaño de la fuente en los botones */
+        font-size: 1.1rem;
         transition: background-color 0.3s ease;
-        width: 220px; /* Ajustar el ancho de los botones */
+        width: 220px;
         text-align: center;
     }
 
@@ -77,7 +87,7 @@
     }
 
     form button {
-        margin-top: 15px; /* Ajustar el espacio entre el botón y los otros elementos */
+        margin-top: 15px;
         background-color: #ff4b5c;
         color: white;
         padding: 10px 20px;
@@ -86,7 +96,7 @@
         font-size: 1rem;
         cursor: pointer;
         transition: background-color 0.3s ease;
-        width: 220px; /* Mantener consistencia con los botones de arriba */
+        width: 220px;
     }
 
     form button:hover {

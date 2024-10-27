@@ -3,7 +3,35 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .models import ProjectFolder, ChangeHistory, ActivityFolder
-from .forms import ProjectFolderForm, ActivityFolderForm, RegistroForm
+from .forms import ProjectFolderForm, ActivityFolderForm, RegistroForm,RoleForm
+from .models import Role
+from django.contrib.auth.models import Permission
+from django.contrib.auth.decorators import user_passes_test
+
+@user_passes_test(lambda u: u.is_superuser)
+def ver_usuarios(request):
+    users = User.objects.all()
+    roles = Role.objects.all()
+    user_roles = {user: user.role_set.all() for user in users}
+    return render(request, 'ver_usuarios.html', {'user_roles': user_roles})
+
+
+@login_required
+def ver_permisos(request):
+    user_permissions = request.user.get_all_permissions()
+    return render(request, 'ver_permisos.html', {'user_permissions': user_permissions})
+
+@user_passes_test(lambda u: u.is_superuser)
+def crear_rol(request):
+    if request.method == 'POST':
+        form = RoleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('ver_roles')
+    else:
+        form = RoleForm()
+    return render(request, 'Crear_rol.html', {'form': form})
+
 
 @login_required  # Requiere que el usuario esté autenticado
 def home(request):
@@ -76,14 +104,17 @@ def registro(request):
         form = RegistroForm(request.POST)
         if form.is_valid():
             user = form.save()
+            if user.is_superuser:
+                messages.success(request, 'Te has registrado como administrador.')
+            else:
+                messages.success(request, 'Registro exitoso. Bienvenido a CatNest.')
             return redirect('home')
         else:
-            return render(request, 'registration/registro.html', {'form': form})
-        
+            messages.error(request, 'Por favor corrige los errores en el formulario.')
     else:
         form = RegistroForm()
+    return render(request, 'registration/registro.html', {'form': form})
 
-    return render(request, 'registration/registro.html', {'form' : form})
 
 def change_history(request):
     history = ChangeHistory.objects.all().order_by('-change_date')

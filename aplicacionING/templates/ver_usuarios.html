@@ -1,0 +1,13 @@
+<h2>Usuarios Registrados y Roles</h2>
+<table>
+    <tr>
+        <th>Usuario</th>
+        <th>Roles</th>
+    </tr>
+    {% for user, roles in user_roles.items %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{% for rol in roles %}{{ rol.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        </tr>
+    {% endfor %}
+</table>

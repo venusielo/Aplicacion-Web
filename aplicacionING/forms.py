@@ -4,7 +4,19 @@ from django.utils.translation import gettext_lazy as _
 from .models import ProjectFolder, ActivityFolder
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission
+from .models import Role
 
+
+class RoleForm(forms.ModelForm):
+    permissions = forms.ModelMultipleChoiceField(
+        queryset=Permission.objects.all(),
+        widget=forms.CheckboxSelectMultiple
+    )
+
+    class Meta:
+        model = Role
+        fields = ['name', 'permissions']
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(label='Usuario')
@@ -26,7 +38,7 @@ class ProjectFolderForm(forms.ModelForm):
 class ActivityFolderForm(forms.ModelForm):
     name = forms.CharField(label='Nombre')
     description = forms.CharField(label='Descripcion')
-    due_date= forms.CharField(label="Fecha de Termino")
+    due_date= forms.CharField(label="Fecha Limite")
     class Meta:
         model = ActivityFolder
         fields = ['name', 'description', 'due_date']
@@ -35,10 +47,11 @@ class ActivityFolderForm(forms.ModelForm):
         }
 
 class RegistroForm(forms.ModelForm):
-    username = forms.CharField(label='Nombre de usuario')  # Etiqueta personalizada
-    email = forms.EmailField(label='Correo electrónico')  # Etiqueta personalizada
+    username = forms.CharField(label='Nombre de usuario')
+    email = forms.EmailField(label='Correo electrónico')
     password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Confirma tu contraseña', widget=forms.PasswordInput)
+    is_admin = forms.BooleanField(label='¿Registrar como administrador?', required=False)
 
     class Meta:
         model = User
@@ -50,15 +63,17 @@ class RegistroForm(forms.ModelForm):
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Las contraseñas no coinciden.")
         return password2
-    
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
+        if self.cleaned_data.get("is_admin"):
+            user.is_staff = True
+            user.is_superuser = True
         if commit:
             user.save()
         return user
 
-    
 class ProjectForm(forms.ModelForm):
     name = forms.CharField(label='Nombre')
     description = forms.CharField(label='Descripcion')
