@@ -10,11 +10,10 @@ from django.contrib.auth.decorators import user_passes_test
 
 @user_passes_test(lambda u: u.is_superuser)
 def ver_usuarios(request):
-    users = User.objects.all()
+    users = userr.objects.all()
     roles = Role.objects.all()
     user_roles = {user: user.role_set.all() for user in users}
     return render(request, 'ver_usuarios.html', {'user_roles': user_roles})
-
 
 @login_required
 def ver_permisos(request):
