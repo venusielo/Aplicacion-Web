@@ -88,7 +88,23 @@
         <h2>Registro</h2>
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}  <!-- Muestra los campos del formulario -->
+            <!-- Campos individuales en lugar de {{ form.as_p }} para más control -->
+            <div>
+                <label for="username">Nombre de usuario:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="email">Correo electrónico:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="password1">Contraseña:</label>
+                <input type="password" id="password1" name="password1" required>
+            </div>
+            <div>
+                <label for="password2">Confirma tu contraseña:</label>
+                <input type="password" id="password2" name="password2" required>
+            </div>
 
             <!-- Checkbox para registrarse como administrador -->
             <div class="checkbox-container">

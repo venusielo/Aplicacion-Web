@@ -1,13 +1,117 @@
-<h2>Usuarios Registrados y Roles</h2>
-<table>
-    <tr>
-        <th>Usuario</th>
-        <th>Roles</th>
-    </tr>
-    {% for user, roles in user_roles.items %}
-        <tr>
-            <td>{{ user.username }}</td>
-            <td>{% for rol in roles %}{{ rol.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-        </tr>
-    {% endfor %}
-</table>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios Registrados y Roles</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .user-table {
+            width: 80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-table th, .user-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .user-table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .user-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .edit-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .edit-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Botón para regresar a Home (azul) */
+        .back-btn {
+            display: block;
+            width: 150px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .back-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .role-select {
+            padding: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Usuarios Registrados y Roles</h2>
+    <form method="post" action="{% url 'ver_usuarios' %}">
+        {% csrf_token %}
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Roles</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>
+                            <select name="roles_{{ user.id }}" class="role-select">
+                                {% for role in roles %}
+                                    <option value="{{ role.id }}" {% if role in user.role_set.all %}selected{% endif %}>{{ role.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <button type="submit" name="user_id" value="{{ user.id }}" class="edit-btn">Guardar</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+
+    <a href="{% url 'home' %}" class="back-btn">Volver a la página principal</a>
+
+</body>
+</html>

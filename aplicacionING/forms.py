@@ -1,3 +1,4 @@
+import datetime
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
@@ -51,7 +52,6 @@ class RegistroForm(forms.ModelForm):
     email = forms.EmailField(label='Correo electrónico')
     password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Confirma tu contraseña', widget=forms.PasswordInput)
-    is_admin = forms.BooleanField(label='¿Registrar como administrador?', required=False)
 
     class Meta:
         model = User
@@ -67,16 +67,24 @@ class RegistroForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
-        if self.cleaned_data.get("is_admin"):
-            user.is_staff = True
-            user.is_superuser = True
+        
         if commit:
             user.save()
+            # Asignar el rol por defecto "Usuario Externo"
+            external_role = Role.objects.get(name="Usuario Externo")
+            user.role_set.add(external_role)  # Asignar el rol a usuario
         return user
 
-class ProjectForm(forms.ModelForm):
-    name = forms.CharField(label='Nombre')
-    description = forms.CharField(label='Descripcion')
+class ProjectFolderForm(forms.ModelForm):
+    start_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'min': datetime.date.today().isoformat()}),
+        label='Fecha de Inicio'
+    )
+    end_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'min': datetime.date.today().isoformat()}),
+        label='Fecha de Término'
+    )
+
     class Meta:
-            model = ProjectFolder
-            fields = ['name', 'description']
+        model = ProjectFolder
+        fields = ['name', 'description', 'start_date', 'end_date']

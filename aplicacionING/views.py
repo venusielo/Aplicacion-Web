@@ -5,20 +5,52 @@ from django.contrib import messages
 from .models import ProjectFolder, ChangeHistory, ActivityFolder
 from .forms import ProjectFolderForm, ActivityFolderForm, RegistroForm,RoleForm
 from .models import Role
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission,User
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import Group
+from django.contrib.auth import logout
+
+def custom_logout_view(request):
+    logout(request)
+    return redirect('login')  # Asegúrate de que el nombre de la URL de login sea 'login'
 
 @user_passes_test(lambda u: u.is_superuser)
 def ver_usuarios(request):
-    users = userr.objects.all()
+    users = User.objects.all()
     roles = Role.objects.all()
-    user_roles = {user: user.role_set.all() for user in users}
-    return render(request, 'ver_usuarios.html', {'user_roles': user_roles})
+    if request.method == "POST":
+        user_id = request.POST.get("user_id")
+        selected_role_id = request.POST.get(f"roles_{user_id}")
+        if user_id and selected_role_id:
+            user = User.objects.get(id=user_id)
+            role = Role.objects.get(id=selected_role_id)
+            user.role_set.clear()  # Limpiar roles actuales
+            user.role_set.add(role)  # Asignar el nuevo rol
+        return redirect('ver_usuarios')
+    return render(request, 'ver_usuarios.html', {'users': users, 'roles': roles})
 
 @login_required
 def ver_permisos(request):
-    user_permissions = request.user.get_all_permissions()
-    return render(request, 'ver_permisos.html', {'user_permissions': user_permissions})
+    # Define permisos generales por rol
+    permisos_generales = {
+        'Administrador': ["Crear", "Editar", "Eliminar", "Ver historial"],
+        'Miembro del equipo': ["Editar"],
+        'Usuario externo': ["Ver"]
+    }
+    
+    # Determina el rol actual del usuario
+    if request.user.is_superuser:
+        rol = 'Administrador'
+    elif request.user.groups.filter(name='Miembro del equipo').exists():
+        rol = 'Miembro del equipo'
+    else:
+        rol = 'Usuario externo'
+    
+    # Obtiene los permisos generales en función del rol del usuario
+    permisos_usuario = permisos_generales.get(rol, [])
+
+    return render(request, 'ver_permisos.html', {'permisos_usuario': permisos_usuario, 'rol': rol})
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def crear_rol(request):
@@ -29,24 +61,29 @@ def crear_rol(request):
             return redirect('ver_roles')
     else:
         form = RoleForm()
-    return render(request, 'Crear_rol.html', {'form': form})
+    return render(request, 'crear_rol.html', {'form': form})
 
 
-@login_required  # Requiere que el usuario esté autenticado
+
+@login_required
 def home(request):
-    return render(request, 'home.html')
+    es_miembro_equipo = request.user.groups.filter(name="Miembro del Equipo").exists() if request.user.is_authenticated else False
+    context = {
+        'es_miembro_equipo': es_miembro_equipo
+    }
+    return render(request, 'home.html', context)
 
 def modificar_proyecto(request, proyecto_id):
-    proyecto = get_object_or_404(ProjectFolder, id=proyecto_id)
+    project = get_object_or_404(ProjectFolder, id=proyecto_id)
     if request.method == "POST":
         
-        proyecto.name = request.POST.get('name')
-        proyecto.description = request.POST.get('description')
-        proyecto.save()
+        project.name = request.POST.get('name')
+        project.description = request.POST.get('description')
+        project.save()
         
         
         ChangeHistory.objects.create(
-            project=proyecto,
+            project=project,
             change_description="El proyecto fue modificado"
         )
     
@@ -77,25 +114,32 @@ def list_project_folders(request):
         return render(request, 'carpetas.html', {'message': message})
     return render(request, 'carpetas.html', {'projects': projects})
 
+
 @login_required
 def create_project(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'Se requieren permisos de administrador para crear un proyecto.')
+        return redirect('home')
+
     if request.method == 'POST':
         form = ProjectFolderForm(request.POST)
         if form.is_valid():
-             project = form.save(commit=False)
-             project.owner = request.user  # Asigna el usuario actual como propietario
-             project.save()
+            project = form.save(commit=False)
+            project.owner = request.user  # Asigna el usuario actual como propietario
+            project.save()
 
-             ChangeHistory.objects.create(
+            ChangeHistory.objects.create(
                 project=project,
                 change_description="Proyecto creado"
-             )
+            )
 
-             return redirect('home')
+            messages.success(request, 'Proyecto creado exitosamente.')
+            return redirect('home')
     else:
-        form = ProjectFolderForm()  
+        form = ProjectFolderForm()
 
-    return render(request, 'CreateProject.html', {'form': form})     
+    return render(request, 'CreateProject.html', {'form': form})
+  
 
 
 def registro(request):
@@ -114,15 +158,18 @@ def registro(request):
         form = RegistroForm()
     return render(request, 'registration/registro.html', {'form': form})
 
-
+@login_required
 def change_history(request):
     history = ChangeHistory.objects.all().order_by('-change_date')
     return render(request, 'change_history.html', {'history': history})
-# @login_required  # Requiere que el usuario esté autenticado
 
+@login_required
 def OpenProject(request, project_id):
-    project = get_object_or_404(ProjectFolder, id = project_id)
-    return render(request, 'OpenProject.html', {'project' : project})
+    project = get_object_or_404(ProjectFolder, id=project_id)
+    # Verificar si el usuario es miembro del equipo o superusuario
+    es_miembro_equipo = request.user.groups.filter(name="Miembro del Equipo").exists() or request.user.is_superuser
+    
+    return render(request, 'OpenProject.html', {'project': project, 'es_miembro_equipo': es_miembro_equipo})
 
 @login_required
 def DeleteProject(request, project_id):

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Permisos</title>
+    <style>
+        /* Estilos para alinear la presentación de permisos */
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background-color: #007bff;
+            color: white;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+        }
+        .button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Permisos de {{ rol }}</h2>
+        <ul>
+            {% for permiso in permisos_usuario %}
+                <li>{{ permiso }}</li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'home' %}" class="button">Volver a la página principal</a>
+    </div>
+</body>
+</html>

@@ -13,16 +13,24 @@
                     <summary>{{ activity.name }}</summary>
                     <p><strong>Descripción:</strong> {{ activity.description }}</p>
                     <p><strong>Fecha Límite:</strong> {{ activity.due_date }}</p>
-                    <form method="POST" action="{% url 'delete_activity' project_id=project.id activity_id=activity.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </form>
+
+                    <!-- Mostrar el botón de "Eliminar" solo si el usuario es administrador o miembro del equipo -->
+                    {% if es_miembro_equipo %}
+                        <form method="POST" action="{% url 'delete_activity' project_id=project.id activity_id=activity.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    {% endif %}
                 </details>
             </li>
         {% endfor %}
     </ul>
 
-    <a href="{% url 'create_activity' project.id %}" class="button">Agregar Actividad</a><br>
+    <!-- Solo mostrar el botón "Agregar Actividad" si el usuario es administrador o miembro del equipo -->
+    {% if es_miembro_equipo %}
+        <a href="{% url 'create_activity' project.id %}" class="button">Agregar Actividad</a><br>
+    {% endif %}
+
     <a href="{% url 'home' %}" class="back-link">Volver al listado de proyectos</a>
 </div>
 
