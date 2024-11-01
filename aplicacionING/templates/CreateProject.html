@@ -2,68 +2,118 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
-    <h1>Crear Nuevo Proyecto</h1>
-    <form method="POST" class="minimal-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="submit-btn">Guardar Proyecto</button>
-    </form>
+<div class="outer-frame">
+    <div class="project-frame">
+        <div class="container">
+            <h2>Crear Nuevo Proyecto</h2>
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-field">
+                    <label for="id_name">Nombre:</label>
+                    {{ form.name }}
+                </div>
 
-    <a href="{% url 'home' %}" class="back-link">Volver a la página principal</a>
+                <div class="form-field">
+                    <label for="id_start_date">Fecha de Inicio:</label>
+                    {{ form.start_date }}
+                </div>
+
+                <div class="form-field">
+                    <label for="id_end_date">Fecha de Término:</label>
+                    {{ form.end_date }}
+                </div>
+
+                <div class="form-field">
+                    <label for="id_description">Descripción:</label>
+                    {{ form.description }}
+                </div>
+
+                <button type="submit" class="button">Guardar Proyecto</button>
+            </form>
+            <a href="{% url 'home' %}" class="back-link">Volver a la página principal</a>
+        </div>
+    </div>
 </div>
 
 <style>
-    .container {
-        max-width: 600px;
-        margin: 0 auto;
+    /* Ajustes del cuerpo para centrar el contenido */
+    body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+    }
+
+    /* Contenedor exterior que actúa como marco */
+    .outer-frame {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        padding: 30px;
+        box-sizing: border-box;
+    }
+
+    /* Marco principal con borde y centrado */
+    .project-frame {
+        background-color: #ffffff;
+        border: 2px solid #ddd;
+        border-radius: 15px;
         padding: 20px;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+    }
+
+    /* Estilos del contenedor interno */
+    .container {
         text-align: center;
     }
 
-    h1 {
-        font-size: 2rem;
-        color: #333;
-        margin-bottom: 30px;
+    .form-field {
+        margin-bottom: 15px;
+        text-align: left;
     }
 
-    .minimal-form {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
+    .form-field label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
     }
 
-    .minimal-form input, .minimal-form textarea {
+    .form-field input, .form-field textarea {
         width: 100%;
         padding: 10px;
-        border: 1px solid #ccc;
+        border: 1px solid #ddd;
         border-radius: 5px;
-        font-size: 1rem;
+        box-sizing: border-box;
     }
 
-    .submit-btn {
+    .button {
         background-color: #007bff;
         color: white;
-        padding: 10px 20px;
+        padding: 12px 20px;
         border: none;
-        border-radius: 5px;
+        border-radius: 10px;
         cursor: pointer;
-        font-size: 1.1rem;
+        font-size: 1rem;
+        margin-top: 10px;
+        width: 100%;
     }
 
-    .submit-btn:hover {
+    .button:hover {
         background-color: #0056b3;
     }
 
     .back-link {
-        display: inline-block;
+        display: block;
         margin-top: 20px;
         text-decoration: none;
         color: #007bff;
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
 
     .back-link:hover {

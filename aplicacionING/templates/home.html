@@ -2,95 +2,96 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
-    <div class="project-banner">
-        <img src="{% static 'images/kira_proyecto.png' %}" alt="Project Cat" class="cat-image">
-        <h1>CatNest</h1>
+        {% if user.is_authenticated %}
+        <!-- Información de usuario en la esquina superior derecha -->
+        <div class="user-info" style="position: absolute; top: 10px; right: 10px; text-align: right;">
+            <p>Bienvenido, {{ user.username }}</p>
+            <p><a href="{% url 'ver_permisos' %}" class="user-permissions-link">Ver Permisos</a></p>
+            
+            <!-- Formulario para cerrar sesión usando POST -->
+            <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="button" style="background: none; border: none; color: #007bff; cursor: pointer; text-decoration: underline;">Cerrar Sesión</button>
+            </form>
+        </div>
+        {% endif %}
+
+    <div class="container">
+        <div class="project-banner">
+            <img src="{% static 'images/kira_proyecto.png' %}" alt="Project Cat" class="cat-image">
+            <h1>CatNest</h1>
+        </div>
+
+        <div class="project-options">
+            <ul>
+                {% if user.is_superuser or es_miembro_equipo %}
+                    <li><a href="{% url 'CreateProject' %}" class="button">Crear Proyectos</a></li>
+                {% endif %}
+                <li><a href="{% url 'list_project_folders' %}" class="button">Ver Proyectos</a></li>
+                <li><a href="{% url 'change_history' %}" class="button">Historial de Cambios</a></li>
+
+                {% if user.is_superuser %}
+                    <li><a href="{% url 'ver_usuarios' %}" class="button">Ver Usuarios Registrados</a></li>
+                    <li><a href="{% url 'crear_rol' %}" class="button">Crear Roles</a></li>
+                {% endif %}
+            </ul>
+        </div>
     </div>
 
-    <div class="project-options">
-        <ul>
-            <li><a href="{% url 'CreateProject' %}" class="button">Crear Proyectos</a></li>
-            <li><a href="{% url 'list_project_folders' %}" class="button">Ver Proyectos</a></li>
-            <li><a href="{% url 'change_history' %}" class="button">Historial de Cambios</a></li>
-        </ul>
-        <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Cerrar Sesión</button>
-        </form>
-    </div>
-</div>
+    <style>
+        .user-info p {
+            margin: 5px 0;
+        }
 
-<style>
-    body {
-        background-color: #f0f0f0;
-    }
+        .logout-link, .user-permissions-link {
+            color: #007bff;
+            text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 1rem;
+            cursor: pointer;
+        }
 
-    .container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 90vh; /* Ajuste de altura para mejor centrado */
-        text-align: center;
-        padding: 20px; /* Añadir padding para evitar que los elementos se peguen a los bordes */
-    }
+        .logout-link:hover, .user-permissions-link:hover {
+            text-decoration: underline;
+        }
 
-    .cat-image {
-        width: 130px; /* Reducir un poco el tamaño de la imagen para que no se desborde */
-        height: auto;
-        margin-bottom: 10px;
-    }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
 
-    h1 {
-        color: #333;
-        font-size: 2.2rem; /* Ajustar el tamaño de la fuente */
-        margin-bottom: 20px; /* Reducir el margen inferior para más espacio entre el título y los botones */
-        font-family: 'Satisfy', cursive;
-    }
+        .project-banner {
+            margin-bottom: 20px;
+        }
 
-    .project-options ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
+        .project-options ul {
+            list-style-type: none;
+            padding: 0;
+        }
 
-    .project-options li {
-        margin-bottom: 15px; /* Ajustar el espacio entre los botones */
-    }
+        .project-options li {
+            display: inline-block;
+            margin: 10px;
+        }
 
-    .button {
-        background-color: #007bff;
-        color: white;
-        padding: 12px 25px; /* Ajustar el tamaño de los botones */
-        text-decoration: none;
-        border-radius: 10px;
-        display: inline-block;
-        font-size: 1.1rem; /* Ajustar el tamaño de la fuente en los botones */
-        transition: background-color 0.3s ease;
-        width: 220px; /* Ajustar el ancho de los botones */
-        text-align: center;
-    }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
 
-    .button:hover {
-        background-color: #0056b3;
-    }
-
-    form button {
-        margin-top: 15px; /* Ajustar el espacio entre el botón y los otros elementos */
-        background-color: #ff4b5c;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 10px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        width: 220px; /* Mantener consistencia con los botones de arriba */
-    }
-
-    form button:hover {
-        background-color: #d43f4a;
-    }
-</style>
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 {% endblock %}
