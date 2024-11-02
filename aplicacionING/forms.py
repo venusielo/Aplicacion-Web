@@ -67,13 +67,10 @@ class RegistroForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
-        
         if commit:
             user.save()
-            # Asignar el rol por defecto "Usuario Externo"
-            external_role = Role.objects.get(name="Usuario Externo")
-            user.role_set.add(external_role)  # Asignar el rol a usuario
         return user
+
 
 class ProjectFolderForm(forms.ModelForm):
     start_date = forms.DateField(

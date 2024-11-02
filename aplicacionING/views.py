@@ -12,32 +12,36 @@ from django.contrib.auth import logout
 
 def custom_logout_view(request):
     logout(request)
-    return redirect('login')  # Asegúrate de que el nombre de la URL de login sea 'login'
+    return redirect('login')  
 
 @user_passes_test(lambda u: u.is_superuser)
 def ver_usuarios(request):
     users = User.objects.all()
-    roles = Role.objects.all()
+    roles = Group.objects.all()  # Obtener todos los grupos como roles
     if request.method == "POST":
         user_id = request.POST.get("user_id")
         selected_role_id = request.POST.get(f"roles_{user_id}")
         if user_id and selected_role_id:
             user = User.objects.get(id=user_id)
-            role = Role.objects.get(id=selected_role_id)
-            user.role_set.clear()  # Limpiar roles actuales
-            user.role_set.add(role)  # Asignar el nuevo rol
+            role = Group.objects.get(id=selected_role_id)
+            
+            # Elimina todos los grupos previos del usuario y asigna el nuevo
+            user.groups.clear()
+            user.groups.add(role)
         return redirect('ver_usuarios')
     return render(request, 'ver_usuarios.html', {'users': users, 'roles': roles})
 
+
 @login_required
 def ver_permisos(request):
-    # Define permisos generales por rol
     permisos_generales = {
         'Administrador': ["Crear", "Editar", "Eliminar", "Ver historial"],
         'Miembro del equipo': ["Editar"],
         'Usuario externo': ["Ver"]
     }
     
+    request.user.refresh_from_db()
+
     # Determina el rol actual del usuario
     if request.user.is_superuser:
         rol = 'Administrador'
@@ -50,8 +54,6 @@ def ver_permisos(request):
     permisos_usuario = permisos_generales.get(rol, [])
 
     return render(request, 'ver_permisos.html', {'permisos_usuario': permisos_usuario, 'rol': rol})
-
-
 @user_passes_test(lambda u: u.is_superuser)
 def crear_rol(request):
     if request.method == 'POST':
@@ -140,23 +142,34 @@ def create_project(request):
 
     return render(request, 'CreateProject.html', {'form': form})
   
-
-
 def registro(request):
     if request.method == 'POST':
         form = RegistroForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            if user.is_superuser:
+            user = form.save(commit=False)
+            # Verifica si el usuario seleccionó la opción de administrador
+            is_admin = request.POST.get('is_admin')
+            if is_admin:
+                user.is_superuser = True  # Esto convierte al usuario en superusuario
+            user.save()
+            
+            # Asigna el rol correspondiente
+            if is_admin:
+                admin_role = Role.objects.get(name="Administrador")
+                user.role_set.add(admin_role)
                 messages.success(request, 'Te has registrado como administrador.')
             else:
+                external_role = Role.objects.get(name="Usuario Externo")
+                user.role_set.add(external_role)
                 messages.success(request, 'Registro exitoso. Bienvenido a CatNest.')
+
             return redirect('home')
         else:
             messages.error(request, 'Por favor corrige los errores en el formulario.')
     else:
         form = RegistroForm()
     return render(request, 'registration/registro.html', {'form': form})
+
 
 @login_required
 def change_history(request):
