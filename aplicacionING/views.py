@@ -10,6 +10,11 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group
 from django.contrib.auth import logout
 
+import csv
+from django.http import HttpResponse
+from django.contrib.auth.models import User
+
+
 def custom_logout_view(request):
     logout(request)
     return redirect('login')  
@@ -258,3 +263,19 @@ def delete_activity(request, activity_id, project_id):
 def ver_historial(request):
     historial = ChangeHistory.objects.filter(project__owner=request.user).order_by('-change_date')
     return render(request, 'change_history.html', {'change_history': change_history})
+
+
+def export_users_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="registered_users.csv"'
+
+    writer = csv.writer(response)
+
+    writer.writerow(['Usuario', 'Email', 'Date Joined'])
+
+    users = User.objects.all()
+    for user in users:
+        date_joined = user.date_joined.strftime('%Y-%m-%d %H:%M')
+        writer.writerow([user.username, user.email, date_joined])
+
+    return response
