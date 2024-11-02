@@ -10,6 +10,10 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group
 from django.contrib.auth import logout
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 import csv
 from django.http import HttpResponse
 from django.contrib.auth.models import User
@@ -264,6 +268,7 @@ def ver_historial(request):
     historial = ChangeHistory.objects.filter(project__owner=request.user).order_by('-change_date')
     return render(request, 'change_history.html', {'change_history': change_history})
 
+
 def export_users_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="registered_users.csv"'
@@ -278,3 +283,16 @@ def export_users_csv(request):
         writer.writerow([user.username, user.email, date_joined])
 
     return response
+
+@csrf_exempt
+def update_project(request, project_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        project = ProjectFolder.objects.get(id=project_id)
+        project.name = data.get('name', project.name)
+        project.description = data.get('description', project.description)
+        project.save()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
+
+

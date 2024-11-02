@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView
-from .import views 
+from .import views
 from .views import home
 from django.contrib.auth import views as auth_views
 
@@ -22,5 +22,5 @@ urlpatterns = [
     path('ver_permisos/', views.ver_permisos, name='ver_permisos'),
     path('ver_usuarios/', views.ver_usuarios, name='ver_usuarios'),
     path('export-users/', views.export_users_csv, name='export_users_csv'),
-
+    path('update-project/<int:project_id>/', views.update_project, name='update_project'),
 ]
