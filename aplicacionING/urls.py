@@ -21,6 +21,6 @@ urlpatterns = [
     path('crear_rol/', views.crear_rol, name='crear_rol'),
     path('ver_permisos/', views.ver_permisos, name='ver_permisos'),
     path('ver_usuarios/', views.ver_usuarios, name='ver_usuarios'),
-
+    path('export-users/', views.export_users_csv, name='export_users_csv'),
 
 ]
