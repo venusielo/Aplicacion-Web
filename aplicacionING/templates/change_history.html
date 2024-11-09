@@ -9,6 +9,7 @@
         <li class="history-item">
             <strong>{{ change.project.name }}</strong>: {{ change.change_description }} <br>
             <em>Fecha: {{ change.change_date }}</em>
+            <em>Realizado por: {{ change.user.username }}</em>
         </li>
         {% empty %}
         <li class="no-changes">No hay cambios registrados.</li>

@@ -1,10 +1,14 @@
 <h1>Historial de cambios para {{ proyecto.name }}</h1>
 
-<ul>
-    {% for cambio in historial %}
-        <li>{{ cambio.change_date }} - {{ cambio.change_description }}</li>
+<ul class="history-list">
+    {% for change in history %}
+    <li class="history-item">
+        <strong>{{ change.project.name }}</strong>: {{ change.change_description }} <br>
+        <em>Fecha: {{ change.change_date }}</em> <br>
+        <em>Realizado por: {{ change.user.username }}</em>
+    </li>
     {% empty %}
-        <li>No hay cambios registrados para este proyecto.</li>
+    <li class="no-changes">No hay cambios registrados.</li>
     {% endfor %}
 </ul>
 

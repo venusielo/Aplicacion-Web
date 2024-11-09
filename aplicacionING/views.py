@@ -86,7 +86,9 @@ def modificar_proyecto(request, proyecto_id):
         
         ChangeHistory.objects.create(
             project=project,
-            change_description="El proyecto fue modificado"
+            change_description="El proyecto fue modificado",
+            user=request.user
+
         )
     
     return redirect('proyecto_detalle', proyecto_id=proyecto_id)
@@ -101,7 +103,8 @@ def create_project_folder(request):
 
             ChangeHistory.objects.create(
                 project = project,
-                change_description = f"Se creó el proyecto {project.name}"
+                change_description = f"Se creó el proyecto {project.name}",
+                user=request.user
             )
             return redirect('list_project_folders')
     else:
@@ -132,7 +135,8 @@ def create_project(request):
 
             ChangeHistory.objects.create(
                 project=project,
-                change_description="Proyecto creado"
+                change_description="Proyecto creado",
+                user=request.user
             )
 
             messages.success(request, 'Proyecto creado exitosamente.')
@@ -194,7 +198,8 @@ def DeleteProject(request, project_id):
         
         ChangeHistory.objects.create(
             project=project,
-            change_description=f'Se eliminó el proyecto {project_name}'
+            change_description=f'Se eliminó el proyecto {project_name}',
+            user=request.user
         )
 
         project.activities.all().delete()
@@ -223,7 +228,8 @@ def create_activity_folder(request, project_id):
             ChangeHistory.objects.create(
                 project=project,
                 activity=activity,
-                change_description=f"Actividad '{activity.name}' creada en el proyecto '{project.name}'"
+                change_description=f"Actividad '{activity.name}' creada en el proyecto '{project.name}'",
+                user=request.user
             )
 
             return redirect('OpenProject', project_id=project_id)
