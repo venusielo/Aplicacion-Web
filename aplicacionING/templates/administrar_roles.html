@@ -1,0 +1,137 @@
+<html>
+    <head>
+	<title>Administrar roles</title>
+<style>
+.role-management-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.role-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.role-header h3 {
+    flex-grow: 1;
+    text-align: center;
+    margin: 0;
+}
+
+.role-column {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.add-permission-btn, .add-role-btn, .back-btn {
+    font-size: 24px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.add-role {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-button-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}
+
+.back-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.delete-permission-btn, .delete-role-btn {
+    background-color: transparent;
+    color: red;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    margin: 0 5px;
+}
+
+</style>
+    </head>
+
+    <main>
+<div class="role-management-container">
+    <div class="role-header">
+        <!-- Lista de Roles con permisos específicos -->
+        {% for role in roles %}
+        <div class="role-column">
+            <h3>
+	    {{ role.name }}
+
+	    <form action="{% url 'delete_role' role.id %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="delete-role-btn">-</button>
+            </form>
+	    </h3>
+            <ul>
+                {% for permission in role.permissions.all %}
+                    <li>
+		        <form action="{% url 'delete_permission' role.id permission.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-permission-btn">-</button>
+                        </form>
+			{{ permission.name }}
+		    </li>
+                {% empty %}
+                    <li>-</li>
+                {% endfor %}
+                <!-- Formulario para añadir permisos a este rol específico -->
+                <li>
+                    <form action="{% url 'add_permission' role.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="text" name="permission_name" placeholder="Nuevo permiso" required>
+			<!-- <button type="submit" class="add-permission-btn">+</button> -->
+                    </form>
+                </li>
+            </ul>
+        </div>
+        {% endfor %}
+        
+        <!-- Formulario para añadir un nuevo rol -->
+        <div class="add-role">
+            <form action="{% url 'add_role' %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="role_name" placeholder="Nuevo rol" required>
+                <button type="submit" class="add-role-btn">+</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Botón de Regresar -->
+    <div class="back-button-container">
+        <button onclick="window.history.back()" class="back-btn">Regresar</button>
+    </div>
+</div>
+	
+    </main>
+</html>

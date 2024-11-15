@@ -27,11 +27,13 @@
                 {% if user.is_superuser or es_miembro_equipo %}
                     <li><a href="{% url 'CreateProject' %}" class="button">Crear Proyectos</a></li>
                 {% endif %}
+
                 <li><a href="{% url 'list_project_folders' %}" class="button">Ver Proyectos</a></li>
                 <li><a href="{% url 'change_history' %}" class="button">Historial de Cambios</a></li>
 
                 {% if user.is_superuser %}
                     <li><a href="{% url 'ver_usuarios' %}" class="button">Ver Usuarios Registrados</a></li>
+		    <li><a href="{% url 'administrar_roles' %}" class="button">Administrar Roles</a></li>
                 {% endif %}
             </ul>
         </div>

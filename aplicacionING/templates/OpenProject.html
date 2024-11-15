@@ -3,35 +3,30 @@
 {% block content %}
 <div class="container">
     <h1>{{ project.name }}</h1>
-    <p><strong>Descripción del Proyecto:</strong> {{ project.description }}</p>
+    <p><strong>Descripción del Proyecto:</strong> {{ project.description }}</p> 
 
-    <h2>Actividades del proyecto</h2>
+    <!-- Sección de Actividades Atrasadas -->
+     <h2>Actividades Atrasadas</h2>
     <ul class="activity-list">
-        {% for activity in project.activities.all %}
-            <li class="activity-item">
-                <details>
-                    <summary>{{ activity.name }}</summary>
-                    <p><strong>Descripción:</strong> {{ activity.description }}</p>
-                    <p><strong>Fecha Límite:</strong> {{ activity.due_date }}</p>
-
-                    <!-- Mostrar el botón de "Eliminar" solo si el usuario es administrador o miembro del equipo -->
-                    {% if es_miembro_equipo %}
-                        <form method="POST" action="{% url 'delete_activity' project_id=project.id activity_id=activity.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                        </form>
-                    {% endif %}
-                </details>
-            </li>
+        {% for activity in atrasadas %}
+            {% include 'activity_item.html' with activity=activity %}
+        {% empty %}
+            <p>No hay actividades atrasadas.</p>
         {% endfor %}
     </ul>
 
-    <!-- Solo mostrar el botón "Agregar Actividad" si el usuario es administrador o miembro del equipo -->
-    {% if es_miembro_equipo %}
-        <a href="{% url 'create_activity' project.id %}" class="button">Agregar Actividad</a><br>
-    {% endif %}
+    <!-- Sección de Actividades Por Entregar -->
+    <h2>Actividades Por Entregar</h2>
+    <ul class="activity-list">
+        {% for activity in por_entregar %}
+            {% include 'activity_item.html' with activity=activity %}
+        {% empty %}
+            <p>-</p>
+        {% endfor %}
+    </ul>
 
-    <a href="{% url 'home' %}" class="back-link">Volver al listado de proyectos</a>
+        <a href="{% url 'create_activity' project.id %}" class="button">Agregar Actividad</a><br>
+    <a href="{% url 'home' %}" class="button">Volver</a>
 </div>
 
 <style>
@@ -48,66 +43,44 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
-    h1 {
-        font-size: 2.5rem;
-        color: #333;
-        margin-bottom: 20px;
-    }
-
-    h2 {
-        font-size: 2rem;
-        margin-top: 30px;
-        margin-bottom: 15px;
-    }
-
-    .activity-list {
-        list-style-type: none;
-        padding: 0;
-    }
-
     .activity-item {
         margin-bottom: 20px;
-    }
-
-    details {
-        background-color: #f9f9f9;
+        padding: 15px;
         border: 1px solid #ddd;
-        border-radius: 5px;
-        padding: 10px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
     }
 
-    summary {
-        font-size: 1.2rem;
-        font-weight: bold;
+    .atrasada {
+        background-color: #f8d7da;
+    }
+
+    .por-entregar {
+        background-color: #d4edda;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 12px;
         cursor: pointer;
     }
 
     .button {
+        display: inline-block;
         background-color: #007bff;
         color: white;
         padding: 10px 20px;
         text-decoration: none;
         border-radius: 5px;
-        display: inline-block;
-        margin-top: 20px;
-        font-size: 1rem;
     }
 
-    .button:hover {
-        background-color: #0056b3;
+     .activity-item.atrasada {
+        background-color: #f8d7da; /* Rojo claro para actividades atrasadas */
     }
-
-    .back-link {
-        display: inline-block;
-        margin-top: 10px;
-        text-decoration: none;
-        color: #007bff;
-    }
-
-    .back-link:hover {
-        text-decoration: underline;
-    }
-
+    .activity-item.por-entregar {
+        background-color: #d4edda; /* Verde claro para actividades por entregar */
 </style>
-
 {% endblock %}
+
