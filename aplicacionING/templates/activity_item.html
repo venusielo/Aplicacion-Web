@@ -1,0 +1,92 @@
+<li class="activity-item {% if activity.due_date < today %}atrasada{% else %}por-entregar{% endif %}" style="margin-left: {{ activity.parent|default:0|add:2 }}em;">
+    <details>
+        <summary>{{ activity.name }}</summary>
+        <p><strong>Descripción:</strong> {{ activity.description }}</p>
+        <p><strong>Fecha Límite:</strong> {{ activity.due_date }}</p>
+        
+        {% if es_miembro_equipo %}
+            <div class="action-buttons">
+                <button class="btn-subtask" onclick="toggleSubtaskForm('{{ activity.id }}')">Sub-Tarea</button>
+                <form method="POST" action="{% url 'delete_activity' project_id=project.id activity_id=activity.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+            
+            <!-- Formulario para agregar sub-tarea -->
+            <form method="POST" action="{% url 'OpenProject' project.id %}" class="subtask-form" id="subtask-form-{{ activity.id }}" style="display: none; margin-top: 20px; ">
+                {% csrf_token %}
+
+		    <!-- Campo oculto para enviar el parent_id -->
+    		    <input type="hidden" name="parent_id" value="{{ activity.id }}">
+		    
+		    <!-- Campo para el título -->
+    		    <label for="title-{{ activity.id }}"><strong>Título:</strong></label>
+    		    <input type="text" id="title-{{ activity.id }}" name="name" placeholder="Nombre de la sub-tarea" required style="width: 100%; margin-bottom: 10px;">
+    
+    		    <!-- Campo para la descripción -->
+    		    <label for="description-{{ activity.id }}"><strong>Descripción:</strong></label>
+    		    <textarea id="description-{{ activity.id }}" name="description" placeholder="Descripción" required style="width: 100%; margin-bottom: 10px;"></textarea>
+    
+    		    <!-- Campo para la fecha límite -->
+    		    <label for="due-date-{{ activity.id }}"><strong>Fecha Límite:</strong></label>
+    		    <input type="date" id="due-date-{{ activity.id }}" name="due_date" required style="width: 100%; margin-bottom: 10px;">
+                    
+		    <button type="submit" class="btn">Agregar Sub-Tarea</button>
+            </form>
+        {% endif %}
+    </details>
+    
+    <!-- Renderizar sub-actividades de forma recursiva -->
+    {% if activity.subactivities.all %}
+        <ul>
+            {% for subactivity in activity.subactivities.all %}
+                {% include 'activity_item.html' with activity=subactivity %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>
+
+<script>
+function toggleSubtaskForm(activityId) {
+    const form = document.getElementById(`subtask-form-${activityId}`);
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+
+<style>
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre los botones */
+}
+
+.btn-subtask {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-subtask:hover {
+    background-color: #5a6268;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+</style>
+
+

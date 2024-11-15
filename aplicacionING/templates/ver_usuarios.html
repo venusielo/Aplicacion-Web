@@ -76,6 +76,15 @@
             padding: 5px;
             font-size: 14px;
         }
+
+	.delete-btn {
+    	    background-color: #DC143C;
+            color: white;
+	    border: none;
+	    padding: 5px 10px;
+	    border-radius: 5px;
+	    text-align: center;
+	}
     </style>
 </head>
 <body>
@@ -104,6 +113,7 @@
                         </td>
                         <td>
                             <button type="submit" name="user_id" value="{{ user.id }}" class="edit-btn">Guardar</button>
+			    <button type="submit" name="delete_user_id" value="{{ user.id }}" class="delete-btn" formaction="{% url 'eliminar_usuario' user.id %}">Eliminar</button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -112,6 +122,8 @@
     </form>
 
     <a href="{% url 'home' %}" class="back-btn">Volver a la página principal</a>
+    <a href="{% url 'export_users_csv' %}" class="btn btn-primary">Export Users</a>
+    
 
 </body>
 </html>

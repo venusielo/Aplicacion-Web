@@ -10,6 +10,7 @@ class Role(models.Model):
     def __str__(self):
         return self.name
 
+
 class ProjectFolder(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
@@ -25,6 +26,7 @@ class ProjectFolder(models.Model):
 
 class ActivityFolder(models.Model):
     project = models.ForeignKey(ProjectFolder, on_delete=models.CASCADE, related_name='activities')
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='subactivities')
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     due_date = models.DateField(null=True, blank=True)
@@ -32,6 +34,7 @@ class ActivityFolder(models.Model):
 
     def __str__(self):
         return self.name
+
     
 #class ChangeHistory(models.Model):
 #    project = models.ForeignKey(ProjectFolder, on_delete=models.CASCADE, related_name='change_history')

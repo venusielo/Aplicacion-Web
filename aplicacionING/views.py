@@ -4,11 +4,22 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .models import ProjectFolder, ChangeHistory, ActivityFolder
 from .forms import ProjectFolderForm, ActivityFolderForm, RegistroForm,RoleForm
-from .models import Role
+from .models import Role, ProjectFolder, ActivityFolder
 from django.contrib.auth.models import Permission,User
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group
 from django.contrib.auth import logout
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+import csv
+from django.http import HttpResponse
+from django.contrib.auth.models import User
+
+from datetime import date, datetime
+
 
 def custom_logout_view(request):
     logout(request)
@@ -258,3 +269,145 @@ def delete_activity(request, activity_id, project_id):
 def ver_historial(request):
     historial = ChangeHistory.objects.filter(project__owner=request.user).order_by('-change_date')
     return render(request, 'change_history.html', {'change_history': change_history})
+
+
+def export_users_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="registered_users.csv"'
+
+    writer = csv.writer(response)
+
+    writer.writerow(['Usuario','Rol', 'Email', 'Date Joined'])
+
+    users = User.objects.all()
+    for user in users:
+        # Determina el rol actual del usuario
+        if request.user.is_superuser:
+            rol = 'Administrador'
+        elif request.user.groups.filter(name='Miembro del equipo').exists():
+            rol = 'Miembro del equipo'
+        else:
+            rol = 'Usuario externo'
+
+        date_joined = user.date_joined.strftime('%Y-%m-%d %H:%M')
+        writer.writerow([user.username, rol, user.email, date_joined])
+
+    return response
+
+def eliminar_usuario(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user.delete()
+    return redirect('ver_usuarios') 
+
+@csrf_exempt
+def update_project(request, project_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        project = ProjectFolder.objects.get(id=project_id)
+        project.name = data.get('name', project.name)
+        project.description = data.get('description', project.description)
+        project.save()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
+
+def administrar_roles(request):
+    # Obtener todos los roles de la base de datos
+    roles = Role.objects.all()
+    # Pasar los roles al template
+    context = {'roles': roles}
+    return render(request, 'administrar_roles.html', context)
+
+def add_role(request):
+    if request.method == 'POST':
+        new_role = Role(name=request.POST['role_name'])
+        print("Role name:", new_role)  # Depuración
+        if new_role:
+            Role.objects.create(name=new_role)
+    return redirect('administrar_roles')
+
+from django.contrib.contenttypes.models import ContentType
+
+def add_permission(request, role_id):
+    role = get_object_or_404(Role, id=role_id)
+    if request.method == 'POST':
+        # Obtener el nombre del permiso desde el formulario
+        permission_name = request.POST.get('permission_name')
+        
+        if permission_name:
+            # Intentar obtener un permiso existente
+            content_type = ContentType.objects.get_for_model(Role)
+            permission, created = Permission.objects.get_or_create(
+                codename=permission_name.lower().replace(" ", "_"),
+                name=permission_name,
+                content_type=content_type
+            )
+            # Añadir el permiso al rol
+            role.permissions.add(permission)
+        
+    return redirect('administrar_roles')
+
+def delete_role(request, role_id):
+    # Obtener el rol a eliminar y luego eliminarlo
+    role = get_object_or_404(Role, id=role_id)
+    role.delete()
+    return redirect('administrar_roles')  # Redirige de nuevo a la página de administración de roles
+
+def delete_permission(request, role_id, permission_id):
+    # Obtener el rol y el permiso
+    role = get_object_or_404(Role, id=role_id)
+    permission = get_object_or_404(Permission, id=permission_id)
+    # Remover el permiso del rol (sin eliminar el permiso de la base de datos)
+    role.permissions.remove(permission)
+    return redirect('administrar_roles')  # Redirige de nuevo a la página de administración de roles
+
+
+def OpenProject(request, project_id):
+    project = get_object_or_404(ProjectFolder, id=project_id)
+    today = date.today()
+
+    # Obtener todas las actividades relacionadas con el proyecto
+    activities = project.activities.filter(parent=None)
+    
+    # Separar actividades en 'atrasadas' y 'por entregar'
+    atrasadas = activities.filter(due_date__lt=today)
+    por_entregar = activities.filter(due_date__gte=today)
+    
+    # Verificación de si el usuario tiene permisos para modificar
+    es_miembro_equipo = request.user.is_superuser or request.user.groups.filter(name="Miembro del Equipo").exists()
+    
+    # Manejar la creación de una sub-actividad
+    if request.method == 'POST':
+        parent_id = request.POST.get('parent_id')
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        due_date = request.POST.get('due_date')
+        
+        parent_activity = ActivityFolder.objects.get(id=parent_id) if parent_id else None
+        new_activity = ActivityFolder(
+            project=project,
+            parent=parent_activity,
+            name=name,
+            description=description,
+            due_date=due_date
+        )
+        new_activity.save()
+        return redirect('OpenProject', project_id=project_id)
+
+    return render(request, 'OpenProject.html', {
+        'project': project,
+        'today': today,
+        'atrasadas': atrasadas,
+        'por_entregar': por_entregar,
+        'es_miembro_equipo': es_miembro_equipo
+    })
+
+
+@login_required
+def delete_activity(request, project_id, activity_id):
+    activity = get_object_or_404(ActivityFolder, id=activity_id)
+
+    if request.method == 'POST':
+        activity.delete()
+        return redirect('OpenProject', project_id=project_id)
+    return redirect('OpenProject', project_id=project_id)
+
