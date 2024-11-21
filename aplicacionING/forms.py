@@ -6,7 +6,9 @@ from .models import ProjectFolder, ActivityFolder
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Permission
-from .models import Role
+from .models import Role , Task
+from .models import Task
+
 
 
 class RoleForm(forms.ModelForm):
@@ -39,19 +41,46 @@ class ProjectFolderForm(forms.ModelForm):
 class ActivityFolderForm(forms.ModelForm):
     name = forms.CharField(label='Nombre')
     description = forms.CharField(label='Descripcion')
-    due_date= forms.CharField(label="Fecha Limite")
+    due_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'min': datetime.date.today().isoformat()}),
+        label='Fecha de entrega'
+    )
+    assigned_to = forms.ModelChoiceField(   ####
+        queryset=User.objects.all(),
+        required=False,
+        label="Asignado a",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = ActivityFolder
-        fields = ['name', 'description', 'due_date']
+        fields = ['name', 'description', 'due_date', 'assigned_to'] ###
         widgets = {
             'due_date': forms.DateInput(attrs={'type':'date'})
         }
+
+class TaskForm(forms.ModelForm):
+    name = forms.CharField(label='Nombre')
+    description = forms.CharField(label='Descripcion')
+    start_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'min': datetime.date.today().isoformat()}),
+        label='Fecha de Inicio'
+    )
+    end_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'min': datetime.date.today().isoformat()}),
+        label='Fecha de final'
+    )
+    class Meta:
+        model = Task
+        fields = ['name', 'description', 'start_date', 'end_date',]
 
 class RegistroForm(forms.ModelForm):
     username = forms.CharField(label='Nombre de usuario')
     email = forms.EmailField(label='Correo electrónico')
     password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Confirma tu contraseña', widget=forms.PasswordInput)
+    is_admin = forms.BooleanField(required=False, label="Registrar como administrador")
+    is_collaborator = forms.BooleanField(required=False, label="Registrar como colaborador")
 
     class Meta:
         model = User

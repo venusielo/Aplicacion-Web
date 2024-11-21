@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Agregar Tarea a la Actividad: {{ activity.name }}</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Guardar Tarea</button>
+    </form>
+
+    <a href="{% url 'OpenProject' activity.project.id %}" class="btn btn-secondary">Volver</a>
+</div>
+
+<style>
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin-top: 10px;
+        text-decoration: none;
+        color: white;
+        background-color: #007bff;
+        border-radius: 5px;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+    }
+</style>
+{% endblock %}
