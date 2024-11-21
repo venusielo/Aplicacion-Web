@@ -1,0 +1,86 @@
+<li class="activity-item {% if activity in atrasadas %}atrasada{% elif activity in por_entregar %}por-entregar{% elif activity in completadas %}completada{% endif %}">
+    <details>
+        <summary>{{ activity.name }}</summary>
+        <p><strong>Descripción:</strong> {{ activity.description }}</p>
+
+        <!-- Mostrar el usuario asignado -->
+        {% if activity.assigned_to %}
+            <p><strong>Asignado a:</strong> {{ activity.assigned_to.username }}</p>
+        {% else %}
+            <p><strong>Asignado a:</strong> No asignado</p>
+        {% endif %}
+
+        <p><strong>Fecha Límite:</strong> {{ activity.due_date }}</p>
+
+        <!-- Botón para agregar tarea -->
+        <a href="{% url 'create_task' activity_id=activity.id %}" class="button">Agregar Tarea</a>
+
+        <!-- Listar Tareas Asociadas -->
+        <h4>Tareas de la Actividad</h4>
+        <ul>
+            {% for task in activity.tasks.all %}
+                <li>
+                    <details>
+                        <summary>
+                            {{ task.name }}
+                            {% if task.completed %}
+                                (Completada)
+                            {% endif %}
+                        </summary>
+                        <p><strong>Descripción:</strong> {{ task.description }}</p>
+                        <p><strong>Fecha Inicio:</strong> {{ task.start_date }}</p>
+                        <p><strong>Fecha Fin:</strong> {{ task.end_date }}</p>
+                        {% if not task.completed %}
+                            <form method="POST" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="task_id" value="{{ task.id }}">
+                                <button type="submit" name="mark_complete" class="btn">Marcar como Completada</button>
+                            </form>
+                        {% endif %}
+                    </details>
+                </li>
+            {% empty %}
+                <p>No hay tareas asociadas a esta actividad.</p>
+            {% endfor %}
+        </ul>
+
+        {% if es_miembro_equipo %}
+            <div class="action-buttons">
+                <button class="btn-subtask" onclick="toggleSubtaskForm('{{ activity.id }}')">Sub-Actividad</button>
+                <form method="POST" action="{% url 'delete_activity' project_id=project.id activity_id=activity.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+
+            <!-- Formulario para agregar sub-actividad -->
+            <form method="POST" action="{% url 'OpenProject' project.id %}" class="subtask-form" id="subtask-form-{{ activity.id }}" style="display: none; margin-top: 20px;">
+                {% csrf_token %}
+                <input type="hidden" name="parent_id" value="{{ activity.id }}">
+                <label for="title-{{ activity.id }}"><strong>Título:</strong></label>
+                <input type="text" id="title-{{ activity.id }}" name="name" placeholder="Nombre de la sub-tarea" required>
+                <label for="description-{{ activity.id }}"><strong>Descripción:</strong></label>
+                <textarea id="description-{{ activity.id }}" name="description" placeholder="Descripción" required></textarea>
+                <label for="due-date-{{ activity.id }}"><strong>Fecha Límite:</strong></label>
+                <input type="date" id="due-date-{{ activity.id }}" name="due_date" required>
+                <button type="submit" class="btn">Agregar Sub-Tarea</button>
+            </form>
+        {% endif %}
+    </details>
+
+    <!-- Renderizar sub-actividades de forma recursiva -->
+    {% if activity.subactivities.all %}
+        <ul>
+            {% for subactivity in activity.subactivities.all %}
+                {% include 'activity_item.html' with activity=subactivity %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>
+
+<script>
+function toggleSubtaskForm(activityId) {
+    const form = document.getElementById(`subtask-form-${activityId}`);
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+</script>
