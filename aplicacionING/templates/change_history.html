@@ -1,84 +1,122 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Cambios</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filters a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: bold;
+            border: 1px solid #4a90e2;
+            border-radius: 4px;
+            padding: 5px 10px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .filters a:hover {
+            background-color: #4a90e2;
+            color: #fff;
+        }
+        .change-card {
+            background: #e3f2fd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            transition: transform 0.3s;
+        }
+        .change-card:hover {
+            transform: translateY(-5px);
+        }
+        .project-title {
+            font-weight: bold;
+            color: #1e88e5;
+            font-size: 1.2em;
+        }
+        .change-description {
+            font-size: 1em;
+            margin: 5px 0;
+        }
+        .change-info {
+            font-size: 0.9em;
+            color: #777;
+        }
+        .back-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-button a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #4a90e2;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .back-button a:hover {
+            background-color: #357ABD;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Historial de Cambios</h1>
+        
+        <div class="filters">
+            <a href="?order=asc">Orden Ascendente</a>
+            <a href="?order=desc">Orden Descendente</a>
+            <a href="?tipo=todos">Todos</a>
+            <a href="?tipo=actividad">Cambios de Actividad</a>
+            <a href="?tipo=tarea">Cambios de Tarea</a>
+        </div>
 
-{% block content %}
-<div class="container">
-    <h1>Historial de Cambios</h1>
-
-    <ul class="history-list">
         {% for change in history %}
-        <li class="history-item">
-            <strong>{{ change.project.name }}</strong>: {{ change.change_description }} <br>
-            <em>Fecha: {{ change.change_date }}</em>
-        </li>
-        {% empty %}
-        <li class="no-changes">No hay cambios registrados.</li>
+        <div class="change-card">
+            <div class="project-title">
+                {% if change.project %}{{ change.project.name|upper }}{% endif %}
+                {% if change.activity %} - {{ change.activity.name|upper }}{% endif %}
+            </div>
+            <div class="change-description">
+                {{ change.change_description }}
+            </div>
+            <div class="change-info">
+                Fecha: {{ change.change_date|date:"d F Y, h:i a" }} - Hecho por {{ change.user.username }}
+            </div>
+        </div>
         {% endfor %}
-    </ul>
 
-    <a href="{% url 'home' %}" class="back-link">Volver a la página principal</a>
-</div>
-
-<style>
-    body {
-        background-color: #f0f0f0;
-    }
-
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-        font-size: 2.5rem;
-        color: #333;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    .history-list {
-        list-style-type: none;
-        padding: 0;
-    }
-
-    .history-item {
-        background-color: #fafafa;
-        padding: 15px;
-        margin-bottom: 15px;
-        border-radius: 5px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .history-item strong {
-        font-size: 1.2rem;
-        color: #007bff;
-    }
-
-    .history-item em {
-        font-size: 0.9rem;
-        color: #666;
-    }
-
-    .no-changes {
-        text-align: center;
-        color: #999;
-        font-size: 1.1rem;
-    }
-
-    .back-link {
-        display: inline-block;
-        margin-top: 20px;
-        text-decoration: none;
-        color: #007bff;
-        font-size: 1rem;
-    }
-
-    .back-link:hover {
-        text-decoration: underline;
-    }
-</style>
-
-{% endblock %}
+        <div class="back-button">
+            <a href="{% url 'home' %}"><i class="fas fa-arrow-left"></i> Volver a la página principal</a>
+        </div>
+    </div>
+</body>
+</html>

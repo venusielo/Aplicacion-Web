@@ -30,6 +30,7 @@ urlpatterns = [
     path('delete_permission/<int:role_id>/<int:permission_id>/', views.delete_permission, name='delete_permission'),  # Eliminar un permiso de un rol
     path('activity/<int:activity_id>/create_task/', views.create_task, name='create_task'),
     path('tasks/<int:task_id>/complete/', views.mark_task_complete, name='mark_task_complete'),
+    path('tasks/<int:task_id>/delete/', views.delete_task, name='delete_task'),
 
 
 ]

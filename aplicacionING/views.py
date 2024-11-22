@@ -67,7 +67,7 @@ def registro(request):
     return render(request, 'registration/registro.html', {'form': form})
 
 
-@login_required
+
 def home(request):
     es_admin = request.user.groups.filter(name="Administrador").exists()
     es_colaborador = request.user.groups.filter(name="Colaborador").exists()
@@ -79,7 +79,7 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-@login_required
+
 def ver_permisos(request):
     # Define los permisos para cada rol
     permisos_generales = {
@@ -114,7 +114,7 @@ def ver_permisos(request):
 
 
 ###################################################################################################### CREAR PROYECTOS.
-@login_required
+
 def create_project_folder(request):
     if request.method == 'POST':
         form = ProjectFolderForm(request.POST)
@@ -124,7 +124,8 @@ def create_project_folder(request):
 
             ChangeHistory.objects.create(
                 project = project,
-                change_description = f"Proyecto {project.name} creado"
+                change_description = f"Proyecto {project.name} creado",
+                user=request.user
             )
             return redirect('list_project_folders')
     else:
@@ -132,7 +133,7 @@ def create_project_folder(request):
     return render(request, 'create_project_folder.html', {'form': form})
 
 
-@login_required
+
 def create_project(request):
     if not request.user.groups.filter(name="Administrador").exists():
         messages.warning(request, 'Se requieren permisos de administrador para crear un proyecto.')
@@ -147,7 +148,8 @@ def create_project(request):
 
             ChangeHistory.objects.create(
                 project=project,
-                change_description="Proyecto creado"
+                change_description="Proyecto creado",
+                user=request.user
             )
 
             messages.success(request, 'Proyecto creado exitosamente.')
@@ -160,7 +162,7 @@ def create_project(request):
 
 
 ###################################################################################################### VER PROYECTOS.
-@login_required
+
 def list_project_folders(request):
     projects = ProjectFolder.objects.all()
     if not projects:
@@ -170,23 +172,27 @@ def list_project_folders(request):
 
 
 
-@login_required
+
 def OpenProject(request, project_id):
     project = get_object_or_404(ProjectFolder, id=project_id)
     today = now().date() 
 
-     # Obtener todas las actividades principales relacionadas con el proyecto
+    # Obtener todas las actividades principales relacionadas con el proyecto
     activities = project.activities.filter(parent=None)
 
     # Filtrar actividades según las condiciones especificadas
     atrasadas = [
         activity for activity in activities if activity.due_date < today and not all(task.completed for task in activity.tasks.all())
     ]
-    por_entregar = [
-        activity for activity in activities if activity.due_date >= today and not all(task.completed for task in activity.tasks.all())
-    ]
+
     completadas = [
-        activity for activity in activities if all(task.completed for task in activity.tasks.all())
+        activity for activity in activities if activity.tasks.exists() and all(task.completed for task in activity.tasks.all())
+    ]
+
+    por_entregar = [
+        activity for activity in activities if activity not in completadas and activity.due_date >= today and (
+            not activity.tasks.exists() or not all(task.completed for task in activity.tasks.all())
+        )
     ]
 
     # Manejar la creación de una sub-actividad o marcar tareas como completadas
@@ -209,11 +215,23 @@ def OpenProject(request, project_id):
                 due_date=due_date,
                 assigned_to=assigned_to
             )
+            # Registro del cambio
+            ChangeHistory.objects.create(
+                project=project,
+                change_description=f"Actividad '{name}' creada",
+                user=request.user
+            )
         elif 'mark_complete' in request.POST:  # Marcar tarea como completada
             task_id = request.POST.get('task_id')
             task = Task.objects.get(id=task_id)
             task.completed = True
             task.save()
+            # Registro del cambio
+            ChangeHistory.objects.create(
+                project=project,
+                change_description=f"Tarea '{task.name}' marcada como completada",
+                user=request.user
+            )
 
         return redirect('OpenProject', project_id=project_id)
 
@@ -222,12 +240,12 @@ def OpenProject(request, project_id):
         'atrasadas': atrasadas,
         'por_entregar': por_entregar,
         'completadas': completadas,
-        'users': User.objects.all(),  # Para asignar usuarios
+        'users': User.objects.all(),
         'today': today,
     })
 
 
-@login_required
+
 def mark_task_complete(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     if request.method == 'POST':
@@ -243,7 +261,7 @@ def mark_task_complete(request, task_id):
         return redirect('OpenProject', project_id=activity.project.id)
 
 
-@login_required
+
 def modificar_proyecto(request, proyecto_id):
     project = get_object_or_404(ProjectFolder, id=proyecto_id)
     if request.method == "POST":
@@ -253,13 +271,13 @@ def modificar_proyecto(request, proyecto_id):
 
         ChangeHistory.objects.create(
             project=project,
-            change_description="El proyecto fue modificado"
+            change_description="El proyecto fue modificado",
+            user=request.user 
         )
     
     return redirect('OpenProject', project_id=proyecto_id)
 
 
-@csrf_exempt
 def update_project(request, project_id):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -267,11 +285,18 @@ def update_project(request, project_id):
         project.name = data.get('name', project.name)
         project.description = data.get('description', project.description)
         project.save()
+
+        # Registro del cambio, asociando el usuario que hizo la modificación
+        ChangeHistory.objects.create(
+            project=project,
+            change_description="El proyecto fue actualizado",
+            user=request.user  # Aquí asignamos el usuario que realiza el cambio
+        )
+
         return JsonResponse({'success': True})
     return JsonResponse({'success': False})
 
 
-@login_required
 def DeleteProject(request, project_id):
     if not request.user.is_superuser:
         messages.warning(request, 'Se requieren permisos de administrador para eliminar un proyecto.')
@@ -284,8 +309,10 @@ def DeleteProject(request, project_id):
 
         ChangeHistory.objects.create(
             project=project,
-            change_description=f'Proyecto {project_name} eliminado'
-        )
+            change_description=f'Proyecto {project_name} eliminado',
+            user=request.user  # Aquí asignamos el usuario que realiza el cambio
+
+         )
 
         project.activities.all().delete()
         project.delete()
@@ -297,7 +324,7 @@ def DeleteProject(request, project_id):
     return redirect('home')
 
 ############################################# OPCIONES DENTRO DEL PROYECTO.
-@login_required
+
 def create_activity_folder(request, project_id):
     project = get_object_or_404(ProjectFolder, id=project_id)
 
@@ -311,8 +338,9 @@ def create_activity_folder(request, project_id):
             ChangeHistory.objects.create(
                 project=project,
                 activity=activity,
-                change_description=f"Actividad '{activity.name}' creada en el proyecto '{project.name}'"
-            )
+                change_description=f"Actividad '{activity.name}' creada en el proyecto '{project.name}'",
+                user=request.user # Aquí asignamos el usuario que realiza el cambio
+             )
 
             return redirect('OpenProject', project_id=project_id)
         else:
@@ -324,35 +352,58 @@ def create_activity_folder(request, project_id):
 
 
 
-@login_required
+
 def open_activity(request, activity_id):
     activity = get_object_or_404(ActivityFolder, id=activity_id)
     return render(request, 'create_activity.html', {'activity': activity})
 
-@login_required
+
 def delete_activity(request, project_id, activity_id):
     activity = get_object_or_404(ActivityFolder, id=activity_id)
+
+    ChangeHistory.objects.create(
+                activity=activity,
+                change_description=f"Actividad '{activity.name}' eliminada",
+                user=request.user
+             )
+
 
     if request.method == 'POST':
         activity.delete()
         return redirect('OpenProject', project_id=project_id)
+    
     return redirect('OpenProject', project_id=project_id)
 
 ###################################################################################################### HISTORIAL DE CAMBIOS.
-@login_required
+
 def change_history(request):
-    history = ChangeHistory.objects.all().order_by('-change_date')
-    return render(request, 'change_history.html', {'history': history})
+    # Obtener los parámetros de orden y tipo de cambio de la solicitud
+    order = request.GET.get('order', 'desc')  # Por defecto, orden descendente
+    tipo = request.GET.get('tipo', 'todos')  # Por defecto, todos los tipos de cambios
 
+    # Determinar el tipo de orden
+    if order == 'asc':
+        history = ChangeHistory.objects.all().order_by('change_date')
+    else:
+        history = ChangeHistory.objects.all().order_by('-change_date')
 
-def ver_historial(request):
-    historial = ChangeHistory.objects.filter(project__owner=request.user).order_by('-change_date')
-    return render(request, 'change_history.html', {'change_history': change_history})
+    # Filtrar por tipo de cambio si es necesario
+    if tipo == 'actividad':
+        history = history.filter(change_description__icontains='Actividad')
+    elif tipo == 'tarea':
+        history = history.filter(change_description__icontains='Tarea')
 
+    # Pasar la orden actual y el tipo al contexto para su uso en el template
+    context = {
+        'history': history,
+        'current_order': order,
+        'current_tipo': tipo
+    }
+    return render(request, 'change_history.html', context)
 
 
 ###################################################################################################### VER USUARIOS REGISTRADOS.
-@login_required
+
 @user_passes_test(lambda u: u.groups.filter(name__in=["Administrador", "Colaborador"]).exists())
 def ver_usuarios(request):
     # Inicializa los roles al cargar la página
@@ -492,7 +543,7 @@ def delete_permission(request, role_id, permission_id):
 
 from django.http import HttpResponseRedirect
 
-@login_required
+
 def mark_task_complete(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     if request.method == 'POST':
@@ -505,7 +556,7 @@ def mark_task_complete(request, task_id):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
-@login_required
+
 def create_task(request, activity_id):
     activity = get_object_or_404(ActivityFolder, id=activity_id)
     if request.method == 'POST':
@@ -514,9 +565,39 @@ def create_task(request, activity_id):
             task = form.save(commit=False)
             task.activity = activity
             task.save()
+
+            # Registro del cambio
+            ChangeHistory.objects.create(
+                project=activity.project,
+                activity=activity,
+                change_description=f"Tarea '{task.name}' creada en la actividad '{activity.name}'",
+                user=request.user
+            )
+
             messages.success(request, "Tarea creada exitosamente.")
             return redirect('OpenProject', project_id=activity.project.id)
     else:
         form = TaskForm()
     return render(request, 'create_task.html', {'form': form, 'activity': activity})
 
+
+
+def delete_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    project_id = task.activity.project.id
+
+    if request.method == 'POST':
+        task_name = task.name
+        task.delete()
+
+        # Registro del cambio
+        ChangeHistory.objects.create(
+            project=task.activity.project,
+            activity=task.activity,
+            change_description=f'Tarea "{task_name}" eliminada',
+            user=request.user
+        )
+
+        messages.success(request, f'Tarea "{task_name}" eliminada exitosamente.')
+
+    return redirect('OpenProject', project_id=project_id)
