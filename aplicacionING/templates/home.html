@@ -24,15 +24,18 @@
 
         <div class="project-options">
             <ul>
-                {% if user.is_superuser or es_miembro_equipo %}
+                {% if es_admin %}
                     <li><a href="{% url 'CreateProject' %}" class="button">Crear Proyectos</a></li>
-                {% endif %}
-                <li><a href="{% url 'list_project_folders' %}" class="button">Ver Proyectos</a></li>
-                <li><a href="{% url 'change_history' %}" class="button">Historial de Cambios</a></li>
+		{% endif %}
 
-                {% if user.is_superuser %}
+                    <li><a href="{% url 'list_project_folders' %}" class="button">Ver Proyectos</a></li>
+                    <li><a href="{% url 'change_history' %}" class="button">Historial de Cambios</a></li>		
+
+		
+                {% if es_admin or es_colaborador %}
                     <li><a href="{% url 'ver_usuarios' %}" class="button">Ver Usuarios Registrados</a></li>
-                {% endif %}
+		{% endif %}
+
             </ul>
         </div>
     </div>
