@@ -63,6 +63,7 @@
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Eliminar Actividad</button>
                 </form>
+                <a href="{% url 'edit_activity' project_id=project.id activity_id=activity.id %}" class="btn btn-primary">Editar Actividad</a>
             </div>
         </div>
     </details>

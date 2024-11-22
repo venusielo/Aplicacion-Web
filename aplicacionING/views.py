@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .models import ProjectFolder, ChangeHistory, ActivityFolder
-from .forms import ProjectFolderForm, ActivityFolderForm, RegistroForm,RoleForm,TaskForm
+from .forms import ProjectFolderForm, ActivityFolderForm, RegistroForm,EditActivityForm,TaskForm
 from .models import Role, ProjectFolder, ActivityFolder, Task
 from django.contrib.auth.models import Permission,User
 from django.contrib.auth.decorators import user_passes_test
@@ -355,11 +355,33 @@ def create_activity_folder(request, project_id):
     return render(request, 'create_activity.html', {'form': form, 'project': project})
 
 
-
-
 def open_activity(request, activity_id):
     activity = get_object_or_404(ActivityFolder, id=activity_id)
     return render(request, 'create_activity.html', {'activity': activity})
+def edit_activity(request, project_id, activity_id):
+    activity = get_object_or_404(ActivityFolder, id=activity_id)
+
+    if request.method == 'POST':
+        form = EditActivityForm(request.POST, instance=activity)
+        if form.is_valid():
+            old_due_date = activity.due_date  # Guardar la fecha de vencimiento actual antes de actualizar
+            activity = form.save()  # Guardar la actividad y actualizar la instancia
+
+            # Comparar si la fecha de vencimiento ha cambiado
+            if old_due_date != activity.due_date:
+                ChangeHistory.objects.create(
+                    project=activity.project,
+                    activity=activity,
+                    change_description=f"Fecha de vencimiento de la actividad '{activity.name}' cambiada de {old_due_date} a {activity.due_date}",
+                    user=request.user
+                )
+
+            messages.success(request, f"Actividad '{activity.name}' actualizada exitosamente.")
+            return redirect('OpenProject', project_id=project_id)
+    else:
+        form = EditActivityForm(instance=activity)
+
+    return render(request, 'edit_activity.html', {'form': form, 'activity': activity, 'project_id': project_id})
 
 
 def delete_activity(request, project_id, activity_id):

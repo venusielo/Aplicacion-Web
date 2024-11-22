@@ -102,6 +102,8 @@ class RegistroForm(forms.ModelForm):
 
 
 class ProjectFolderForm(forms.ModelForm):
+    name = forms.CharField(label='Nombre')
+    description = forms.CharField(label='Descripcion')
     start_date = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date', 'min': datetime.date.today().isoformat()}),
         label='Fecha de Inicio'
@@ -114,3 +116,16 @@ class ProjectFolderForm(forms.ModelForm):
     class Meta:
         model = ProjectFolder
         fields = ['name', 'description', 'start_date', 'end_date']
+
+class EditActivityForm(forms.ModelForm):
+    name = forms.CharField(label='Nombre'),
+    description = forms.CharField(label='Descripcion')
+    due_date = forms.DateField(
+    widget=forms.DateInput(attrs={'type': 'date', 'min': datetime.date.today().isoformat()}),
+    label='Fecha de final'
+    )
+    class Meta:
+        model = ActivityFolder
+        fields = ['name', 'description', 'due_date'] 
+        
+   
