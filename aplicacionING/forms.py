@@ -42,7 +42,7 @@ class ActivityFolderForm(forms.ModelForm):
     name = forms.CharField(label='Nombre')
     description = forms.CharField(label='Descripcion')
     due_date = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date', 'min': datetime.date.today().isoformat()}),
+        widget=forms.DateInput(attrs={'type': 'date'}), #'min': datetime.date.today().isoformat()
         label='Fecha de entrega'
     )
     assigned_to = forms.ModelChoiceField(   ####
