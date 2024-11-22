@@ -85,11 +85,36 @@
         .back-button a:hover {
             background-color: #357ABD;
         }
+
+	button.btn-danger {
+   	    background-color: #e74c3c;
+    	    color: white;
+    	    border: none;
+    	    padding: 10px 15px;
+    	    border-radius: 5px;
+    	    cursor: pointer;
+    	    font-weight: bold;
+	}
+
+	button.btn-danger:hover {
+    	    background-color: #c0392b;
+	}
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Historial de Cambios</h1>
+	<div style="display: flex; justify-content: space-between; align-items: center;">
+    	<h1>Historial de Cambios</h1>
+   	{% if es_admin %}
+    		<form method="post" action="{% url 'delete_history' %}">
+        	{% csrf_token %}
+        	<button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que quieres borrar todo el historial?');">
+            		Borrar Todo
+       	 	</button>
+    		</form>
+    	{% endif %}	
+	</div>
+        
         
         <div class="filters">
             <a href="?order=asc">Orden Ascendente</a>

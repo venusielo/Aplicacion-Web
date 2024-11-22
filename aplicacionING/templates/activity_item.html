@@ -1,6 +1,12 @@
 <li class="activity-item {% if activity in por_entregar %}por-entregar{% elif activity in atrasadas %}atrasada{% elif activity in completadas %}completada{% endif %}">
     <details>
-        <summary>{{ activity.name }}</summary>
+        <summary>
+            {{ activity.name }}
+            {% if activity in atrasadas and activity.dias_atraso > 0 %}
+                <span class="atraso">| Atrasado por {{ activity.dias_atraso }} días</span>
+            {% endif %}
+        </summary>
+
         <div class="activity-container">
             <p><strong>Descripción:</strong> {{ activity.description }}</p>
 
@@ -15,7 +21,7 @@
 
             <!-- Botón para agregar tarea -->
             <a href="{% url 'create_task' activity_id=activity.id %}" class="button">Agregar Tarea</a>
-             <div class="activity-container">
+            <div class="activity-container">
                 <!-- Listar Tareas Asociadas -->
                 <h4>Tareas de la Actividad</h4>
                 <ul>
@@ -31,65 +37,76 @@
                                 <p><strong>Descripción:</strong> {{ task.description }}</p>
                                 <p><strong>Fecha Inicio:</strong> {{ task.start_date }}</p>
                                 <p><strong>Fecha Fin:</strong> {{ task.end_date }}</p>
-                                <p><strong>Asignado a:</strong> {{ task.assigned_to.username|default:"No asignado" }}</p>
-                                {% if not task.completed %}
-                                    <form method="POST" style="display: inline;">
+                                <div class="task-action-buttons">
+                                    {% if not task.completed %}
+                                        <form method="POST" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="task_id" value="{{ task.id }}">
+                                            <button type="submit" name="mark_complete" class="btn">Marcar como Completada</button>
+                                        </form>
+                                    {% endif %}
+                                    <!-- Botón para eliminar la tarea -->
+                                    <form method="POST" action="{% url 'delete_task' task_id=task.id %}" style="display: inline;">
                                         {% csrf_token %}
-                                        <input type="hidden" name="task_id" value="{{ task.id }}">
-                                        <button type="submit" name="mark_complete" class="btn">Marcar como Completada</button>
+                                        <button type="submit" class="btn btn-danger">Eliminar Tarea</button>
                                     </form>
-                                {% endif %}
+                                </div>
                             </details>
                         </li>
                     {% empty %}
                         <p>No hay tareas asociadas a esta actividad.</p>
                     {% endfor %}
                 </ul>
-             </div>    
-                <div class="action-buttons">
-                    <form method="POST" action="{% url 'delete_activity' project_id=project.id activity_id=activity.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </form>
-                </div>
+            </div>
+            <div class="action-buttons">
+                <form method="POST" action="{% url 'delete_activity' project_id=project.id activity_id=activity.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar Actividad</button>
+                </form>
+            </div>
         </div>
     </details>
 </li>
 
 <style>
     .activity-container {
-    border: 2px solid #ccc;  /* Cambia el color del borde para diferenciar el contenedor */
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
+        border: 2px solid #ccc;  /* Cambia el color del borde para diferenciar el contenedor */
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
 
-.por-entregar {
-    background-color: #fff3cd; /* Fondo amarillo claro */
-    border: 1px solid #ffeeba; /* Borde ligeramente más oscuro */
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
+    .por-entregar {
+        background-color: #fff3cd; /* Fondo amarillo claro */
+        border: 1px solid #ffeeba; /* Borde ligeramente más oscuro */
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
 
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Espacio entre los botones */
+    }
 
-.action-buttons {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* Espacio entre los botones */
-}
+    .task-action-buttons {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+    }
 
-.btn-danger {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 4px;
-}
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
 
-.btn-danger:hover {
-    background-color: #c82333;
-}
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
 </style>

@@ -59,18 +59,6 @@ class Task(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        """Sobrescribe el método save para registrar cambios."""
-        if self.id:  # Si ya existe
-            original_task = Task.objects.get(id=self.id)
-            if original_task.completed != self.completed:
-                ChangeHistory.objects.create(
-                    project=self.activity.project,
-                    activity=self.activity,
-                    change_description=f"Tarea '{self.name}' marcada como {'completada' if self.completed else 'pendiente'}"
-                )
-        super().save(*args, **kwargs)
-
 
 
     
