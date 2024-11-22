@@ -67,7 +67,7 @@ def registro(request):
     return render(request, 'registration/registro.html', {'form': form})
 
 
-
+@login_required
 def home(request):
     es_admin = request.user.groups.filter(name="Administrador").exists()
     es_colaborador = request.user.groups.filter(name="Colaborador").exists()
