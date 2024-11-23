@@ -276,68 +276,56 @@ def mark_task_complete(request, task_id):
 
         return redirect('OpenProject', project_id=activity.project.id)
 
-
-
-def modificar_proyecto(request, proyecto_id):
-    project = get_object_or_404(ProjectFolder, id=proyecto_id)
-    if request.method == "POST":
-        project.name = request.POST.get('name')
-        project.description = request.POST.get('description')
-        project.save()
-
-        ChangeHistory.objects.create(
-            project=project,
-            change_description="El proyecto fue modificado",
-            user=request.user 
-        )
-    
-    return redirect('OpenProject', project_id=proyecto_id)
-
-
-def update_project(request, project_id):
+@login_required
+def edit_project(request, project_id):
+    project = get_object_or_404(ProjectFolder, id=project_id)
     if request.method == 'POST':
-        data = json.loads(request.body)
-        project = ProjectFolder.objects.get(id=project_id)
-        project.name = data.get('name', project.name)
-        project.description = data.get('description', project.description)
-        project.save()
+        project_name = project.name
+        form = ProjectFolderForm(request.POST, instance=project)
 
-        # Registro del cambio, asociando el usuario que hizo la modificación
         ChangeHistory.objects.create(
             project=project,
-            change_description="El proyecto fue actualizado",
-            user=request.user  # Aquí asignamos el usuario que realiza el cambio
+            change_description=f'Proyecto {project_name} modificado',
+            user=request.user
         )
 
-        return JsonResponse({'success': True})
-    return JsonResponse({'success': False})
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Proyecto actualizado exitosamente.')
+            return redirect('list_project_folders')
+    else:
+        form = ProjectFolderForm(instance=project)
+    return render(request, 'edit_project.html', {'form': form, 'project': project})
 
 
 def DeleteProject(request, project_id):
-    if not request.user.is_superuser:
-        messages.warning(request, 'Se requieren permisos de administrador para eliminar un proyecto.')
-        return redirect('home')
-
+    """
+    Vista para eliminar un proyecto. Solo los administradores pueden eliminar.
+    """
     project = get_object_or_404(ProjectFolder, id=project_id)
     
     if request.method == 'POST':
         project_name = project.name
 
+        # Registrar el cambio en el historial
         ChangeHistory.objects.create(
             project=project,
             change_description=f'Proyecto {project_name} eliminado',
-            user=request.user  # Aquí asignamos el usuario que realiza el cambio
+            user=request.user
+        )
 
-         )
-
-        project.activities.all().delete()
+        # Eliminar el proyecto
         project.delete()
 
+        # Mensaje de éxito
         messages.success(request, f'El proyecto "{project_name}" ha sido eliminado exitosamente.')
 
-        return redirect('home')
+        # Redirigir al listado de proyectos
+        return redirect('list_project_folders')
     
-    return redirect('home')
+    # En caso de que no sea un POST, redirige al listado de proyectos
+    return redirect('list_project_folders')
+
 
 ############################################# OPCIONES DENTRO DEL PROYECTO.
 
@@ -502,72 +490,6 @@ def export_users_csv(request):
         writer.writerow([user.username, rol, user.email, date_joined])
 
     return response
-
-
-
-###################################################################################################### ADMINISTRAR ROLES.
-def administrar_roles(request):
-    # Obtener todos los roles de la base de datos
-    roles = Role.objects.all()
-    # Pasar los roles al template
-    context = {'roles': roles}
-    return render(request, 'administrar_roles.html', context)
-
-def add_role(request):
-    if request.method == 'POST':
-        new_role = Role(name=request.POST['role_name'])
-        print("Role name:", new_role)  # Depuración
-        if new_role:
-            Role.objects.create(name=new_role)
-    return redirect('administrar_roles')
-
-from django.contrib.contenttypes.models import ContentType
-
-
-@user_passes_test(lambda u: u.is_superuser)
-def crear_rol(request):
-    if request.method == 'POST':
-        form = RoleForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('ver_roles')
-    else:
-        form = RoleForm()
-    return render(request, 'crear_rol.html', {'form': form})
-
-
-def delete_role(request, role_id):
-    # Obtener el rol a eliminar y luego eliminarlo
-    role = get_object_or_404(Role, id=role_id)
-    role.delete()
-    return redirect('administrar_roles')  # Redirige de nuevo a la página de administración de roles
-
-def add_permission(request, role_id):
-    role = get_object_or_404(Role, id=role_id)
-    if request.method == 'POST':
-        # Obtener el nombre del permiso desde el formulario
-        permission_name = request.POST.get('permission_name')
-        
-        if permission_name:
-            # Intentar obtener un permiso existente
-            content_type = ContentType.objects.get_for_model(Role)
-            permission, created = Permission.objects.get_or_create(
-                codename=permission_name.lower().replace(" ", "_"),
-                name=permission_name,
-                content_type=content_type
-            )
-            # Añadir el permiso al rol
-            role.permissions.add(permission)
-        
-    return redirect('administrar_roles')
-
-def delete_permission(request, role_id, permission_id):
-    # Obtener el rol y el permiso
-    role = get_object_or_404(Role, id=role_id)
-    permission = get_object_or_404(Permission, id=permission_id)
-    # Remover el permiso del rol (sin eliminar el permiso de la base de datos)
-    role.permissions.remove(permission)
-    return redirect('administrar_roles')  # Para permanecer en la pagina
 
 
 ###################################################################################################### 
