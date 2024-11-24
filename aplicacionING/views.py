@@ -7,11 +7,8 @@ from django.http import HttpResponse
 from django.utils.timezone import now
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import user_passes_test
-
-import json
 import csv
-
-from .models import ProjectFolder, ChangeHistory, ActivityFolder, Task, Role
+from .models import ProjectFolder, ChangeHistory, ActivityFolder, Task
 from .forms import ProjectFolderForm, ActivityFolderForm, RegistroForm, EditActivityForm, TaskForm
 
 # ###################################################################################
@@ -72,11 +69,11 @@ def home(request):
 
 # ###################################################################################
 # Permisos
-
+@login_required
 def ver_permisos(request):
     permisos_generales = {
-        'Administrador': ["Crear", "Editar", "Eliminar", "Ver historial"],
-        'Colaborador': ["Editar", "Ver historial"],
+        'Administrador': ["Crear", "Editar", "Eliminar", "Ver"],
+        'Colaborador': ["Editar", "Ver"],
         'Usuario externo': ["Ver"]
     }
     request.user.refresh_from_db()
@@ -138,10 +135,30 @@ def create_project(request):
 @login_required
 def list_project_folders(request):
     projects = ProjectFolder.objects.all()
+    es_admin = request.user.is_superuser or request.user.groups.filter(name="Administrador").exists()
     if not projects:
         message = "Aun no tienes proyectos"
         return render(request, 'carpetas.html', {'message': message})
+    
     return render(request, 'carpetas.html', {'projects': projects})
+
+
+@login_required
+def list_project_folders(request):
+    projects = ProjectFolder.objects.all()
+    # Determinar si el usuario es administrador o colaborador
+    es_admin = request.user.is_superuser or request.user.groups.filter(name="Administrador").exists()
+    es_colaborador = request.user.groups.filter(name="Colaborador").exists()
+
+    if not projects:
+        message = "Aún no tienes proyectos"
+        return render(request, 'carpetas.html', {'message': message, 'es_admin': es_admin, 'es_colaborador': es_colaborador})
+
+    return render(request, 'carpetas.html', {
+        'projects': projects,
+        'es_admin': es_admin,
+        'es_colaborador': es_colaborador,
+    })
 
 @login_required
 def OpenProject(request, project_id):
