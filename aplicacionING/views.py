@@ -1,11 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
-from django.contrib.auth.models import Permission, User, Group
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import logout
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
 from django.utils.timezone import now
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import user_passes_test

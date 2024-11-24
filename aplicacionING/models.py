@@ -58,6 +58,13 @@ class ActivityFolder(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # Fecha de creación de la actividad
     assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_activities')  # Usuario asignado
     
+    PRIORITY_CHOICES = [
+        ('Alta', 'Alta'),
+        ('Media', 'Media'),
+        ('Baja', 'Baja'),
+    ]
+    priority = models.CharField(max_length=5, choices=PRIORITY_CHOICES, default='Media')
+
     def __str__(self):
         return self.name
 

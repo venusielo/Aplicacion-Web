@@ -118,9 +118,15 @@ class ActivityFolderForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
+    priority = forms.ChoiceField(
+        choices=ActivityFolder.PRIORITY_CHOICES,
+        label="Prioridad",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = ActivityFolder
-        fields = ['name', 'description', 'due_date', 'assigned_to'] 
+        fields = ['name', 'description', 'due_date', 'assigned_to', 'priority'] 
         widgets = {
             'due_date': forms.DateInput(attrs={'type':'date'})
         }

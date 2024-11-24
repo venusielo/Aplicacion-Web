@@ -2,6 +2,7 @@
     <details>
         <summary>
             {{ activity.name }}
+            <span>| {{ activity.priority }} prioridad</span>
             {% if activity in atrasadas and activity.dias_atraso > 0 %}
                 <span class="atraso">| Atrasado por {{ activity.dias_atraso }} días</span>
             {% endif %}
