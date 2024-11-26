@@ -2,6 +2,7 @@
     <details>
         <summary>
             {{ activity.name }}
+	    <span>| {{ activity.priority }} prioridad</span>
             {% if activity in atrasadas and activity.dias_atraso > 0 %}
                 <span class="atraso">| Atrasado por {{ activity.dias_atraso }} días</span>
             {% endif %}
@@ -62,6 +63,7 @@
                 <form method="POST" action="{% url 'delete_activity' project_id=project.id activity_id=activity.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Eliminar Actividad</button>
+                    
                 </form>
             </div>
         </div>

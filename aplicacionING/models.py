@@ -32,7 +32,14 @@ class ActivityFolder(models.Model):
     description = models.TextField(blank=True)
     due_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_activities') ###
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_activities') 
+
+    PRIORITY_CHOICES = [
+        ('Alta', 'Alta'),
+        ('Media', 'Media'),
+        ('Baja', 'Baja'),
+    ]
+    priority = models.CharField(max_length=5, choices=PRIORITY_CHOICES, default='Media')
     
     def __str__(self):
         return self.name
