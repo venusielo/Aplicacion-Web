@@ -17,6 +17,7 @@ urlpatterns = [
     path('projects/eliminar/<int:project_id>/', views.DeleteProject, name='DeleteProject'),
     path('projects/edit/<int:project_id>/', views.edit_project, name='edit_project'),
     path('project/<int:project_id>/create_activity', views.create_activity_folder, name='create_activity'),
+    path('projects/<int:project_id>/activity/<int:activity_id>/edit/', views.edit_activity, name='edit_activity'),
     path('project/<int:project_id>/delete_activity/<int:activity_id>/', views.delete_activity, name='delete_activity'),
     path('ver_permisos/', views.ver_permisos, name='ver_permisos'),
     path('ver_usuarios/', views.ver_usuarios, name='ver_usuarios'),
