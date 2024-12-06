@@ -29,7 +29,7 @@ ul li {
 }
 
 .button {
-    background-color: #007bff; /* Blue color for the buttons */
+    background-color: #4a90e2;; /* Blue color for the buttons */
     color: white;
     padding: 10px 20px;
     text-decoration: none;
@@ -43,7 +43,7 @@ ul li {
 }
 
 form button {
-    background-color: #007bff;
+    background-color: #4a90e2;;
     color: white;
     padding: 10px 15px;
     border: none;

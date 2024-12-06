@@ -7,7 +7,7 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-        <a href="{% url 'OpenProject' project_id %}" class="btn btn-secondary">Cancelar</a>
+        <a href="{% url 'OpenProject' project_id %}" class="btn btn-primary">Cancelar</a>
     </form>
 </div>
 

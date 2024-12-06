@@ -10,7 +10,7 @@
         <button type="submit" class="btn btn-primary">Guardar Tarea</button>
     </form>
 
-    <a href="{% url 'OpenProject' activity.project.id %}" class="btn btn-secondary">Volver</a>
+    <a href="{% url 'OpenProject' activity.project.id %}" class="btn btn-primary">Volver</a>
 </div>
 
 <style>
@@ -29,12 +29,8 @@
         margin-top: 10px;
         text-decoration: none;
         color: white;
-        background-color: #007bff;
+        background-color: #4a90e2;;
         border-radius: 5px;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
     }
 </style>
 {% endblock %}
