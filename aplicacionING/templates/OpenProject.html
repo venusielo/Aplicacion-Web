@@ -26,8 +26,12 @@
     </ul>
 
     <!-- Sección de Actividades Completadas -->
-    <h2>Actividades Completadas</h2>
-    <ul class="activity-list">
+    <h2>
+	Actividades Completadas
+	<button id="toggle-completed" class="button" onclick="toggleCompleted()">Archivar</button>
+    </h2>
+
+    <ul id="completed-activities-list" class="activity-list">
         {% for activity in completadas %}
             {% include 'activity_item.html' with activity=activity %}
         {% empty %}
@@ -65,12 +69,8 @@
         background-color: #f8d7da;
     }
 
-    .por-entregar {
-        background-color: #d4edda;
-    }
-
     .completada {
-        background-color: #e2e3e5;
+        background-color: #40b045;
     }
 
     .btn-danger {
@@ -91,15 +91,33 @@
     }
 
     .activity-item.atrasada {
-        background-color: #f8d7da; /* Rojo claro para actividades atrasadas */
+        background-color: #d96a74;
     }
 
     .activity-item.por-entregar {
-        background-color: #d4edda; /* Verde claro para actividades por entregar */
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
     }
 
     .activity-item.completada {
-        background-color: #e2e3e5; /* Gris claro para actividades completadas */
+        background-color: #7ec69b
     }
 </style>
+
+<!-- Archivar -->
+<script>
+    function toggleCompleted() {
+        const completedList = document.getElementById('completed-activities-list');
+        const toggleButton = document.getElementById('toggle-completed');
+
+        if (completedList.style.display === 'none') {
+            completedList.style.display = 'block'; // Mostrar actividades completadas
+            toggleButton.textContent = 'Archivar';
+        } else {
+            completedList.style.display = 'none'; // Ocultar actividades completadas
+            toggleButton.textContent = 'Mostrar';
+        }
+    }
+</script>
+
 {% endblock %}

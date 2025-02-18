@@ -32,13 +32,21 @@ class ActivityFolder(models.Model):
     description = models.TextField(blank=True)
     due_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_activities') ###
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_activities') 
+
+    PRIORITY_CHOICES = [
+        ('Alta', 'Alta'),
+        ('Media', 'Media'),
+        ('Baja', 'Baja'),
+    ]
+    priority = models.CharField(max_length=5, choices=PRIORITY_CHOICES, default='Media')
     
     def __str__(self):
         return self.name
 
     def is_completed(self):
          return all(task.completed for task in self.tasks.all())
+    
     def completed_tasks_count(self):
          return self.tasks.filter(completed=True).count()
 
@@ -58,29 +66,15 @@ class Task(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        """Sobrescribe el método save para registrar cambios."""
-        if self.id:  # Si ya existe
-            original_task = Task.objects.get(id=self.id)
-            if original_task.completed != self.completed:
-                ChangeHistory.objects.create(
-                    project=self.activity.project,
-                    activity=self.activity,
-                    change_description=f"Tarea '{self.name}' marcada como {'completada' if self.completed else 'pendiente'}"
-                )
-        super().save(*args, **kwargs)
 
 
-
-def get_default_user():
-    return User.objects.get(username="sistema").id
-
+    
 class ChangeHistory(models.Model):
     project = models.ForeignKey(ProjectFolder, null=True, blank=True, on_delete=models.SET_NULL)
     activity = models.ForeignKey(ActivityFolder, null=True, blank=True, on_delete=models.SET_NULL)
     change_description = models.CharField(max_length=255)
     change_date = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, default=get_default_user)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='change_histories')
 
     def __str__(self):
-        return f"{self.change_description} - {self.change_date}"    
+        return f"{self.change_description} - {self.change_date}"

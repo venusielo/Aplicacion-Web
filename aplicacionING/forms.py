@@ -42,19 +42,26 @@ class ActivityFolderForm(forms.ModelForm):
     name = forms.CharField(label='Nombre')
     description = forms.CharField(label='Descripcion')
     due_date = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date', 'min': datetime.date.today().isoformat()}),
+        widget=forms.DateInput(attrs={'type': 'date'}), #'min': datetime.date.today().isoformat()
         label='Fecha de entrega'
     )
-    assigned_to = forms.ModelChoiceField(   ####
+
+    assigned_to = forms.ModelChoiceField(
         queryset=User.objects.all(),
         required=False,
         label="Asignado a",
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
+    priority = forms.ChoiceField(
+        choices=ActivityFolder.PRIORITY_CHOICES,
+        label="Prioridad",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = ActivityFolder
-        fields = ['name', 'description', 'due_date', 'assigned_to'] ###
+        fields = ['name', 'description', 'due_date', 'assigned_to', 'priority'] ###
         widgets = {
             'due_date': forms.DateInput(attrs={'type':'date'})
         }
