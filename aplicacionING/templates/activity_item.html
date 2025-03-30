@@ -1,86 +1,117 @@
-<li class="activity-item {% if activity in atrasadas %}atrasada{% elif activity in por_entregar %}por-entregar{% elif activity in completadas %}completada{% endif %}">
+<li class="activity-item {% if activity in por_entregar %}por-entregar{% elif activity in atrasadas %}atrasada{% elif activity in completadas %}completada{% endif %}">
     <details>
-        <summary>{{ activity.name }}</summary>
-        <p><strong>Descripción:</strong> {{ activity.description }}</p>
+        <summary>
+            {{ activity.name }}
+            <span>| {{ activity.priority }} prioridad</span>
+            {% if activity in atrasadas and activity.dias_atraso > 0 %}
+                <span class="atraso">| Atrasado por {{ activity.dias_atraso }} días</span>
+            {% endif %}
+        </summary>
 
-        <!-- Mostrar el usuario asignado -->
-        {% if activity.assigned_to %}
-            <p><strong>Asignado a:</strong> {{ activity.assigned_to.username }}</p>
-        {% else %}
-            <p><strong>Asignado a:</strong> No asignado</p>
-        {% endif %}
+        <div class="activity-container">
+            <p><strong>Descripción:</strong> {{ activity.description }}</p>
 
-        <p><strong>Fecha Límite:</strong> {{ activity.due_date }}</p>
+            <!-- Mostrar el usuario asignado -->
+            {% if activity.assigned_to %}
+                <p><strong>Asignado a:</strong> {{ activity.assigned_to.username }}</p>
+            {% else %}
+                <p><strong>Asignado a:</strong> No asignado</p>
+            {% endif %}
 
-        <!-- Botón para agregar tarea -->
-        <a href="{% url 'create_task' activity_id=activity.id %}" class="button">Agregar Tarea</a>
+            <p><strong>Fecha Límite:</strong> {{ activity.due_date }}</p>
 
-        <!-- Listar Tareas Asociadas -->
-        <h4>Tareas de la Actividad</h4>
-        <ul>
-            {% for task in activity.tasks.all %}
-                <li>
-                    <details>
-                        <summary>
-                            {{ task.name }}
-                            {% if task.completed %}
-                                (Completada)
-                            {% endif %}
-                        </summary>
-                        <p><strong>Descripción:</strong> {{ task.description }}</p>
-                        <p><strong>Fecha Inicio:</strong> {{ task.start_date }}</p>
-                        <p><strong>Fecha Fin:</strong> {{ task.end_date }}</p>
-                        {% if not task.completed %}
-                            <form method="POST" style="display: inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="task_id" value="{{ task.id }}">
-                                <button type="submit" name="mark_complete" class="btn">Marcar como Completada</button>
-                            </form>
-                        {% endif %}
-                    </details>
-                </li>
-            {% empty %}
-                <p>No hay tareas asociadas a esta actividad.</p>
-            {% endfor %}
-        </ul>
-
-        {% if es_miembro_equipo %}
+            <!-- Botón para agregar tarea -->
+            <a href="{% url 'create_task' activity_id=activity.id %}" class="button">Agregar Tarea</a>
+            <div class="activity-container">
+                <!-- Listar Tareas Asociadas -->
+                <h4>Tareas de la Actividad</h4>
+                <ul>
+                    {% for task in activity.tasks.all %}
+                        <li>
+                            <details>
+                                <summary>
+                                    {{ task.name }}
+                                    {% if task.completed %}
+                                        (Completada)
+                                    {% endif %}
+                                </summary>
+                                <p><strong>Descripción:</strong> {{ task.description }}</p>
+                                <p><strong>Fecha Inicio:</strong> {{ task.start_date }}</p>
+                                <p><strong>Fecha Fin:</strong> {{ task.end_date }}</p>
+                                <div class="task-action-buttons">
+                                    {% if not task.completed %}
+                                        <form method="POST" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="task_id" value="{{ task.id }}">
+                                            <button type="submit" name="mark_complete" class="btn">Marcar como Completada</button>
+                                        </form>
+                                    {% endif %}
+                                    <!-- Botón para eliminar la tarea -->
+                                    <form method="POST" action="{% url 'delete_task' task_id=task.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Eliminar Tarea</button>
+                                    </form>
+                                </div>
+                            </details>
+                        </li>
+                    {% empty %}
+                        <p>No hay tareas asociadas a esta actividad.</p>
+                    {% endfor %}
+                </ul>
+            </div>
             <div class="action-buttons">
-                <button class="btn-subtask" onclick="toggleSubtaskForm('{{ activity.id }}')">Sub-Actividad</button>
                 <form method="POST" action="{% url 'delete_activity' project_id=project.id activity_id=activity.id %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar Actividad</button>
                 </form>
+                <a href="{% url 'edit_activity' project_id=project.id activity_id=activity.id %}" 
+                style="background-color: #93cf93; color: white; padding: 8px 12px; text-decoration: none; border-radius: 5px; display: inline-block; transition: background-color 0.3s, transform 0.3s; cursor: pointer;">
+                Editar Actividad
+                </a>
             </div>
-
-            <!-- Formulario para agregar sub-actividad -->
-            <form method="POST" action="{% url 'OpenProject' project.id %}" class="subtask-form" id="subtask-form-{{ activity.id }}" style="display: none; margin-top: 20px;">
-                {% csrf_token %}
-                <input type="hidden" name="parent_id" value="{{ activity.id }}">
-                <label for="title-{{ activity.id }}"><strong>Título:</strong></label>
-                <input type="text" id="title-{{ activity.id }}" name="name" placeholder="Nombre de la sub-tarea" required>
-                <label for="description-{{ activity.id }}"><strong>Descripción:</strong></label>
-                <textarea id="description-{{ activity.id }}" name="description" placeholder="Descripción" required></textarea>
-                <label for="due-date-{{ activity.id }}"><strong>Fecha Límite:</strong></label>
-                <input type="date" id="due-date-{{ activity.id }}" name="due_date" required>
-                <button type="submit" class="btn">Agregar Sub-Tarea</button>
-            </form>
-        {% endif %}
+        </div>
     </details>
-
-    <!-- Renderizar sub-actividades de forma recursiva -->
-    {% if activity.subactivities.all %}
-        <ul>
-            {% for subactivity in activity.subactivities.all %}
-                {% include 'activity_item.html' with activity=subactivity %}
-            {% endfor %}
-        </ul>
-    {% endif %}
 </li>
 
-<script>
-function toggleSubtaskForm(activityId) {
-    const form = document.getElementById(`subtask-form-${activityId}`);
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
-}
-</script>
+<style>
+    .activity-container {
+        border: 2px solid #ccc;  /* Cambia el color del borde para diferenciar el contenedor */
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .por-entregar {
+        background-color: #fff3cd; /* Fondo amarillo claro */
+        border: 1px solid #ffeeba; /* Borde ligeramente más oscuro */
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Espacio entre los botones */
+    }
+
+    .task-action-buttons {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+</style>
