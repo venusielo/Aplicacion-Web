@@ -29,7 +29,7 @@ ul li {
 }
 
 .button {
-    background-color: #007bff; /* Blue color for the buttons */
+    background-color: #4a90e2;; /* Blue color for the buttons */
     color: white;
     padding: 10px 20px;
     text-decoration: none;
@@ -43,7 +43,7 @@ ul li {
 }
 
 form button {
-    background-color: #007bff;
+    background-color: #4a90e2;;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -111,4 +111,32 @@ form button:hover {
 
 .user-info .user-permissions-link:hover {
     text-decoration: underline;
+}
+
+.activity-container {
+    border: 2px solid #ccc;  /* Cambia el color del borde para diferenciar el contenedor */
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f0f0f0;  /* Color de fondo diferente para destacar */
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
 }

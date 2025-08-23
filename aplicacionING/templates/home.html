@@ -3,7 +3,7 @@
 
 {% block content %}
         {% if user.is_authenticated %}
-        <!-- Información de usuario en la esquina superior derecha -->
+        <!-- Información de usuario en la esquina  -->
         <div class="user-info" style="position: absolute; top: 10px; right: 10px; text-align: right;">
             <p>Bienvenido, {{ user.username }}</p>
             <p><a href="{% url 'ver_permisos' %}" class="user-permissions-link">Ver Permisos</a></p>
@@ -11,7 +11,7 @@
             <!-- Formulario para cerrar sesión usando POST -->
             <form method="post" action="{% url 'logout' %}" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" class="button" style="background: none; border: none; color: #007bff; cursor: pointer; text-decoration: underline;">Cerrar Sesión</button>
+                <button type="submit" class="button" style="background:#e74c3c; border: none; cursor: pointer;">Cerrar Sesión</button>
             </form>
         </div>
         {% endif %}
@@ -36,9 +36,6 @@
                     <li><a href="{% url 'ver_usuarios' %}" class="button">Ver Usuarios Registrados</a></li>
 		{% endif %}
 
-		{% if es_admin %}
-		    <li><a href="{% url 'administrar_roles' %}" class="button">Administrar Roles</a></li>
-		{% endif %}
             </ul>
         </div>
     </div>
@@ -87,7 +84,7 @@
         }
 
         .button {
-            background-color: #007bff;
+            background-color: #4a90e2;;
             color: white;
             padding: 10px 20px;
             text-decoration: none;
