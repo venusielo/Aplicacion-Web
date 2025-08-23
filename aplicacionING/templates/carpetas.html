@@ -14,11 +14,11 @@
                 <button class="dropbtn">Opciones</button>
                 <div class="dropdown-content">
                     <a href="{% url 'OpenProject' project.id %}">Abrir proyecto</a>
-		    <a href="#" onclick="openEditModal({{ project.id }}, '{{ project.name }}', '{{ project.description }}')">Editar proyecto</a>
-                    <form action="{% url 'DeleteProject' project.id %}" method="POST" style="display:inline;">
-                        {% csrf_token %}
+                    <a href="{% url 'edit_project' project.id %}">Editar proyecto</a>
+                     <form action="{% url 'DeleteProject' project.id %}" method="POST" style="display:inline;">
+                    {% csrf_token %}
                         <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este proyecto?');">Eliminar proyecto</button>
-                    </form>                
+                     </form>
                 </div>
             </div>
         </li>
